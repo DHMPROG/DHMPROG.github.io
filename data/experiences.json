@@ -1,0 +1,15 @@
+[
+  {
+    "company": "MTL Héros du Terrain",
+    "org": "OBNL montréalais",
+    "role": "Développeur et Directeur Audiovisuel",
+    "dates": "Mai 2024 - Présent",
+    "tags": ["Next.js", "TypeScript", "iOS", "Paiements"],
+    "bullets": [
+      "Conçu et livré la plateforme web et l'application iOS de l'organisme, utilisée par 216 membres inscrits",
+      "Publié l'app sur l'App Store : revue Apple, App Store Connect, certificats, déclarations de confidentialité",
+      "Implémenté l'inscription aux matchs à places limitées, le check-in par QR code, les paiements en ligne et les notifications push",
+      "Bâti les feuilles de match temps réel pour les arbitres et organisateurs"
+    ]
+  }
+]

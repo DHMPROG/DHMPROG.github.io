@@ -1,0 +1,5 @@
+# Admin : utilisée seulement en local (npx serve .)
+admin.html
+
+# Réglages de l'éditeur
+.vscode/
