@@ -31,9 +31,20 @@ Format d'une expérience :
   "role": "Développeur",
   "dates": "Mai 2025 — Présent",
   "tags": ["Next.js", "TypeScript"],
-  "bullets": ["Une réalisation", "Une autre"]
+  "bullets": ["Une réalisation", "Une autre"],
+  "en": {
+    "org": "Montréal non-profit",
+    "role": "Developer",
+    "dates": "May 2025 - Present",
+    "tags": ["Next.js", "TypeScript"],
+    "bullets": ["An achievement", "Another one"]
+  }
 }
 ```
+
+Le bloc `en` est optionnel : il est affiché quand le visiteur choisit **EN** (bouton FR / EN du menu). Un champ absent reprend la version française.
+
+Les autres textes du site (FR et EN) sont dans `index.html`, objet `I18N` du composant.
 
 ## Tester en local
 

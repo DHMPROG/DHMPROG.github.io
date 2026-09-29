@@ -10,6 +10,18 @@
       "Publié l'app sur l'App Store : revue Apple, App Store Connect, certificats, déclarations de confidentialité",
       "Implémenté l'inscription aux matchs à places limitées, le check-in par QR code, les paiements en ligne et les notifications push",
       "Bâti les feuilles de match temps réel pour les arbitres et organisateurs"
-    ]
+    ],
+    "en": {
+      "org": "Montréal non-profit",
+      "role": "Developer & Audiovisual Director",
+      "dates": "May 2024 - Present",
+      "tags": ["Next.js", "TypeScript", "iOS", "Payments"],
+      "bullets": [
+        "Designed and shipped the organization's web platform and iOS app, used by 216 registered members",
+        "Published the app on the App Store: Apple review, App Store Connect, certificates, privacy disclosures",
+        "Built capacity-limited match registration, QR code check-in, online payments and push notifications",
+        "Built real-time match sheets for referees and organizers"
+      ]
+    }
   }
 ]
