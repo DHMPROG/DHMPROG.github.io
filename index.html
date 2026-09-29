@@ -99,10 +99,10 @@
         <span>AMINE.</span>
       </a>
       <div data-desknav="" style="display:flex; flex-wrap:wrap; gap:20px; font-size:11px; font-weight:500; letter-spacing:.22em; color:#8A8A85;">
-        <a href="#about" style="color:#8A8A85;">ABOUT</a>
-        <a href="#skills" style="color:#8A8A85;">SKILLS</a>
-        <a href="#experience" style="color:#8A8A85;">EXPERIENCE</a>
-        <a href="#work" style="color:#8A8A85;">WORK</a>
+        <a href="#about" style="color:#8A8A85;">{{ t.navAbout }}</a>
+        <a href="#skills" style="color:#8A8A85;">{{ t.navSkills }}</a>
+        <a href="#experience" style="color:#8A8A85;">{{ t.navExp }}</a>
+        <a href="#work" style="color:#8A8A85;">{{ t.navWork }}</a>
         <a href="#contact" style="color:#8A8A85;">CONTACT</a>
       </div>
       <div style="display:flex; align-items:center; gap:10px; flex:none;">
@@ -124,10 +124,10 @@
       <span style="font-size:11px; letter-spacing:.22em; color:#6E6E68;">MENU</span>
       <button type="button" onClick="{{ closeMenu }}" aria-label="{{ t.closeMenu }}" style="width:44px; height:44px; border:1px solid #2A2A26; background:none; color:#EDEDE8; font-size:13px; cursor:pointer; border-radius:2px;">✕</button>
     </div>
-    <a href="#about" onClick="{{ closeMenu }}" style="display:flex; align-items:center; gap:14px; padding:14px 0; min-height:44px; border-bottom:1px solid #191919; font-size:12px; letter-spacing:.22em; color:#EDEDE8;"><span style="color:var(--acc); font-size:11px;">02</span>ABOUT</a>
-    <a href="#skills" onClick="{{ closeMenu }}" style="display:flex; align-items:center; gap:14px; padding:14px 0; min-height:44px; border-bottom:1px solid #191919; font-size:12px; letter-spacing:.22em; color:#EDEDE8;"><span style="color:var(--acc); font-size:11px;">03</span>SKILLS</a>
-    <a href="#experience" onClick="{{ closeMenu }}" style="display:flex; align-items:center; gap:14px; padding:14px 0; min-height:44px; border-bottom:1px solid #191919; font-size:12px; letter-spacing:.22em; color:#EDEDE8;"><span style="color:var(--acc); font-size:11px;">04</span>EXPERIENCE</a>
-    <a href="#work" onClick="{{ closeMenu }}" style="display:flex; align-items:center; gap:14px; padding:14px 0; min-height:44px; border-bottom:1px solid #191919; font-size:12px; letter-spacing:.22em; color:#EDEDE8;"><span style="color:var(--acc); font-size:11px;">05</span>WORK</a>
+    <a href="#about" onClick="{{ closeMenu }}" style="display:flex; align-items:center; gap:14px; padding:14px 0; min-height:44px; border-bottom:1px solid #191919; font-size:12px; letter-spacing:.22em; color:#EDEDE8;"><span style="color:var(--acc); font-size:11px;">02</span>{{ t.navAbout }}</a>
+    <a href="#skills" onClick="{{ closeMenu }}" style="display:flex; align-items:center; gap:14px; padding:14px 0; min-height:44px; border-bottom:1px solid #191919; font-size:12px; letter-spacing:.22em; color:#EDEDE8;"><span style="color:var(--acc); font-size:11px;">03</span>{{ t.navSkills }}</a>
+    <a href="#experience" onClick="{{ closeMenu }}" style="display:flex; align-items:center; gap:14px; padding:14px 0; min-height:44px; border-bottom:1px solid #191919; font-size:12px; letter-spacing:.22em; color:#EDEDE8;"><span style="color:var(--acc); font-size:11px;">04</span>{{ t.navExp }}</a>
+    <a href="#work" onClick="{{ closeMenu }}" style="display:flex; align-items:center; gap:14px; padding:14px 0; min-height:44px; border-bottom:1px solid #191919; font-size:12px; letter-spacing:.22em; color:#EDEDE8;"><span style="color:var(--acc); font-size:11px;">05</span>{{ t.navWork }}</a>
     <a href="#contact" onClick="{{ closeMenu }}" style="display:flex; align-items:center; gap:14px; padding:14px 0; min-height:44px; border-bottom:1px solid #191919; font-size:12px; letter-spacing:.22em; color:#EDEDE8;"><span style="color:var(--acc); font-size:11px;">06</span>CONTACT</a>
     <a href="{{ cvHref }}" target="_blank" rel="noopener" onClick="{{ closeMenu }}" style="margin-top:22px; display:inline-flex; align-items:center; justify-content:center; gap:10px; padding:14px 18px; min-height:44px; background:#EDEDE8; color:#050505; font-size:11px; font-weight:600; letter-spacing:.2em;">CV (PDF) ↗</a>
   </div>
@@ -157,7 +157,7 @@
       <h1 style="margin:22px 0 0; font-family:'Instrument Serif', Georgia, serif; font-weight:400; font-size:clamp(52px,11.5vw,172px); line-height:.92; letter-spacing:-0.02em; color:#F4F2ED; text-wrap:balance;"><span data-mask="" style="display:block; overflow:hidden; padding-top:.12em; margin-top:-.12em;"><span data-line="" style="display:block;">Amine</span></span><span data-mask="" style="display:block; overflow:hidden; padding-bottom:.14em; margin-bottom:-.14em;"><span data-line="" data-shimmer="" style="display:block; -webkit-background-clip:text; background-clip:text; background-image:{{ nameBg }}; background-size:100% 300%; color:{{ nameColor }}; animation:om-shimmer 7s ease-in-out infinite alternate;">Dahmane</span></span></h1>
 
       <div data-rv="" style="margin-top:26px; display:flex; flex-wrap:wrap; gap:10px 22px; font-size:13px; font-weight:400; color:#B9B9B2;">
-        <span style="color:#F4F2ED;">Software Engineering Student</span>
+        <span style="color:#F4F2ED;">{{ t.student }}</span>
         <span style="color:#4A4A46;">/</span>
         <span>Full-Stack &amp; Mobile</span>
       </div>
@@ -198,7 +198,7 @@
   <div id="about" style="position:relative; z-index:1; max-width:1240px; margin:0 auto; padding:var(--sec) 20px;">
     <div data-rv="" style="display:flex; align-items:baseline; gap:16px; padding-bottom:20px; border-bottom:1px solid #191919; background-image:linear-gradient(90deg, var(--acc) 0 22%, rgba(5,5,5,0) 22% 100%); background-size:200% 1px; background-position:0 100%; background-repeat:no-repeat; animation:om-dashmove 6s linear infinite;">
       <span data-numglow="" style="font-size:11px; font-weight:500; letter-spacing:.22em; color:var(--acc); animation:om-numglow 3.4s ease-in-out infinite;">02</span>
-      <span style="font-size:11px; font-weight:500; letter-spacing:.22em; color:#B9B9B2;">ABOUT</span>
+      <span style="font-size:11px; font-weight:500; letter-spacing:.22em; color:#B9B9B2;">{{ t.navAbout }}</span>
     </div>
     <div style="margin-top:36px; display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:40px;">
       <p data-rv="" style="margin:0; max-width:660px; font-family:'Instrument Serif', Georgia, serif; font-size:clamp(24px,3vw,36px); line-height:1.28; color:#F4F2ED; text-wrap:pretty;">{{ t.aboutBig }}</p>
@@ -217,7 +217,7 @@
     <div style="max-width:1240px; margin:0 auto; padding:0 20px;">
       <div data-rv="" style="display:flex; align-items:baseline; gap:16px; padding-bottom:20px; border-bottom:1px solid #191919; background-image:linear-gradient(90deg, var(--acc) 0 22%, rgba(5,5,5,0) 22% 100%); background-size:200% 1px; background-position:0 100%; background-repeat:no-repeat; animation:om-dashmove 6s linear infinite;">
         <span data-numglow="" style="font-size:11px; font-weight:500; letter-spacing:.22em; color:var(--acc); animation:om-numglow 3.4s ease-in-out infinite;">03</span>
-        <span style="font-size:11px; font-weight:500; letter-spacing:.22em; color:#B9B9B2;">SKILLS</span>
+        <span style="font-size:11px; font-weight:500; letter-spacing:.22em; color:#B9B9B2;">{{ t.navSkills }}</span>
       </div>
     </div>
 
@@ -272,7 +272,7 @@
   <div id="experience" style="position:relative; z-index:1; max-width:1240px; margin:0 auto; padding:var(--sec) 20px; border-top:1px solid #191919;">
     <div data-rv="" style="display:flex; align-items:baseline; gap:16px; padding-bottom:20px; border-bottom:1px solid #191919; background-image:linear-gradient(90deg, var(--acc) 0 22%, rgba(5,5,5,0) 22% 100%); background-size:200% 1px; background-position:0 100%; background-repeat:no-repeat; animation:om-dashmove 6s linear infinite;">
       <span data-numglow="" style="font-size:11px; font-weight:500; letter-spacing:.22em; color:var(--acc); animation:om-numglow 3.4s ease-in-out infinite;">04</span>
-      <span style="font-size:11px; font-weight:500; letter-spacing:.22em; color:#B9B9B2;">EXPERIENCE</span>
+      <span style="font-size:11px; font-weight:500; letter-spacing:.22em; color:#B9B9B2;">{{ t.navExp }}</span>
     </div>
 
     <sc-if value="{{ expLoading }}">
@@ -310,7 +310,7 @@
   <div id="work" style="position:relative; z-index:1; max-width:1240px; margin:0 auto; padding:var(--sec) 20px; border-top:1px solid #191919;">
     <div data-rv="" style="display:flex; align-items:baseline; gap:16px; padding-bottom:20px; border-bottom:1px solid #191919; background-image:linear-gradient(90deg, var(--acc) 0 22%, rgba(5,5,5,0) 22% 100%); background-size:200% 1px; background-position:0 100%; background-repeat:no-repeat; animation:om-dashmove 6s linear infinite;">
       <span data-numglow="" style="font-size:11px; font-weight:500; letter-spacing:.22em; color:var(--acc); animation:om-numglow 3.4s ease-in-out infinite;">05</span>
-      <span style="font-size:11px; font-weight:500; letter-spacing:.22em; color:#B9B9B2;">WORK</span>
+      <span style="font-size:11px; font-weight:500; letter-spacing:.22em; color:#B9B9B2;">{{ t.navWork }}</span>
       <span style="margin-left:auto; font-size:11px; letter-spacing:.22em; color:#6E6E68;">{{ t.projects }}</span>
     </div>
 
@@ -481,6 +481,8 @@ class Component extends DCLogic {
   static I18N = {
     fr: {
       closeMenu: 'Fermer le menu', switchLang: 'Switch to English',
+      navAbout: 'À PROPOS', navSkills: 'COMPÉTENCES', navExp: 'EXPÉRIENCE', navWork: 'PROJETS',
+      student: 'Étudiant en génie logiciel',
       open: 'OUVERT AUX STAGES',
       looking: 'Recherche un stage en développement logiciel,',
       flowA1: 'Chaque flux de travail,', flowA2: 'connecté pour vrai.',
@@ -498,6 +500,8 @@ class Component extends DCLogic {
     },
     en: {
       closeMenu: 'Close menu', switchLang: 'Passer en français',
+      navAbout: 'ABOUT', navSkills: 'SKILLS', navExp: 'EXPERIENCE', navWork: 'WORK',
+      student: 'Software Engineering Student',
       open: 'OPEN TO INTERNSHIPS',
       looking: 'Looking for a software development internship,',
       flowA1: 'Every workflow,', flowA2: 'actually connected.',
