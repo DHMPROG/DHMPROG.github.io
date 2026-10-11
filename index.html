@@ -251,6 +251,23 @@ h2.sec.yank{animation:yank .9s ease-out}
 @keyframes cvbox{from{opacity:0;transform:scale(1.25)}to{opacity:1;transform:none}}
 .cvtrack{position:fixed;left:0;top:0;width:110px;height:130px;border:1.5px dashed var(--accent2);--c:var(--accent2)}
 .cvtrack i{position:absolute;left:50%;top:50%;width:14px;height:14px;margin:-7px;border:1px solid var(--accent2);border-radius:50%}
+/* autocomplétion façon IDE */
+.cmd{position:relative}
+.sug{position:absolute;left:.5rem;bottom:calc(100% + 2.1rem);display:flex;align-items:flex-start;z-index:11;font-size:13px;filter:drop-shadow(0 18px 30px rgb(0 0 0 / .35));animation:sugin .14s ease-out}
+@keyframes sugin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.sug ul{list-style:none;margin:0;padding:3px 0;width:min(430px,calc(100vw - 2rem));max-height:min(300px,45vh);overflow:auto;background:var(--panel);border:1px solid var(--line)}
+.sug li{display:flex;align-items:center;gap:.6rem;padding:.2rem .7rem;cursor:pointer;white-space:nowrap}
+.sug li .ic{flex:none;width:1.25rem;height:1.25rem;display:grid;place-items:center;border:1px solid var(--line);font-size:11px;color:var(--ic,var(--dim))}
+.sug li .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;color:var(--fg)}
+.sug li .nm b{color:var(--accent);font-weight:600}
+.sug li .sg{color:var(--dim);font-size:12px;overflow:hidden;text-overflow:ellipsis;max-width:45%}
+.sug li.on{background:var(--sel)}
+.sug li.on .ic{border-color:var(--ic,var(--accent))}
+.sug .doc{width:min(300px,30vw);margin-left:-1px;background:var(--panel);border:1px solid var(--line);padding:.6rem .8rem;color:var(--fg);font-size:12.5px;line-height:1.55}
+.sug .doc code{display:block;color:var(--accent2);margin-bottom:.35rem;font:inherit;white-space:normal;word-break:break-word}
+.sug .doc .ex{color:var(--dim);margin-top:.45rem}
+.sug .foot{padding:.25rem .7rem;border-top:1px solid var(--line);color:var(--dim);font-size:11px}
+@media (max-width:760px){.sug{left:0;right:0;flex-direction:column;padding-inline:.5rem}.sug ul{width:100%}.sug .doc{width:100%;margin:-1px 0 0}}
 /* terminal du hero */
 .hero-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:clamp(2rem,4vw,5rem);align-items:center}
 .term{display:none;border:1px solid var(--line);background:color-mix(in srgb,var(--panel) 88%,transparent);backdrop-filter:blur(6px);box-shadow:0 30px 60px -40px var(--accent);transition:transform .4s cubic-bezier(.2,.7,.2,1)}
@@ -475,7 +492,8 @@ body{font-size:clamp(14px,.35vw + 8.5px,17px)}
     <span class="prog" id="prog"></span>
   </div>
   <div class="cmd">
-    <input id="cmdline" aria-label="Command line" placeholder=":theme papier | nuit" autocomplete="off" spellcheck="false">
+    <div class="sug" id="sug" hidden role="listbox" aria-label="Suggestions"></div>
+    <input id="cmdline" aria-label="Command line" aria-autocomplete="list" aria-controls="sug" placeholder=":theme papier | nuit" autocomplete="off" spellcheck="false">
     <span class="hint"><kbd>j</kbd>/<kbd>k</kbd> scroll · <kbd>1–5</kbd> jump · <kbd>:</kbd> command</span>
     <button type="button" class="lang" id="langBtn" aria-label="Switch to English"><b data-l="fr">FR</b> / <b data-l="en">EN</b></button>
     <div class="themes" role="group" aria-label="Theme">
@@ -869,9 +887,72 @@ document.getElementById('langBtn').addEventListener('click',()=>setLang(LANG==='
   }
   const CV_HELP='cv2: .Canny .Sobel .GaussianBlur .threshold .cvtColor .bitwise_not .resize .detect .track .reset';
 
+  /* ---------- autocomplétion (catalogue des commandes) ---------- */
+  const IC={fn:['ƒ','var(--accent2)'],sec:['§','var(--third)'],th:['◐','var(--accent)'],lang:['A','var(--accent)'],fun:['★','var(--third)'],sys:['?','var(--dim)'],mod:['⇣','var(--accent2)']};
+  const CMDS=[
+    ['sec','readme','','Aller à l’intro.','Jump to the intro.'],
+    ['sec','projects','','Aller aux projets.','Jump to projects.'],
+    ['sec','log','','Aller à l’expérience.','Jump to experience.'],
+    ['sec','stack','','Aller aux compétences.','Jump to skills.'],
+    ['sec','contact','','Aller au contact.','Jump to contact.'],
+    ['th','theme papier','light','Thème clair.','Light theme.'],
+    ['th','theme nuit','dark','Thème sombre.','Dark theme.'],
+    ['lang','lang fr','','Afficher le site en français.','Show the site in French.'],
+    ['lang','lang en','','Afficher le site en anglais.','Show the site in English.'],
+    ['mod','import cv2','','Charge le module. Essaie ensuite cv2.detect.','Loads the module. Then try cv2.detect.'],
+    ['fn','cv2.detect','(frame)','Détecte les éléments visibles et les encadre avec un label et un score de confiance.','Detects visible elements and draws labeled boxes with confidence scores.'],
+    ['fn','cv2.track','(frame, cursor)','Une boîte de suivi colle à ton curseur. Relance pour arrêter.','A tracking box follows your cursor. Run again to stop.'],
+    ['fn','cv2.Canny','(frame, 100, 200)','Détection de contours : la page devient des traits lumineux.','Edge detection: the page turns into glowing outlines.'],
+    ['fn','cv2.Sobel','(frame, CV_64F, 1, 1)','Gradient de Sobel : effet de relief gravé.','Sobel gradient: an embossed relief.'],
+    ['fn','cv2.GaussianBlur','(frame, (9, 9), 0)','Flou gaussien sur toute la page.','Gaussian blur over the whole page.'],
+    ['fn','cv2.threshold','(frame, 127, 255)','Seuillage binaire : noir et blanc pur.','Binary threshold: pure black and white.'],
+    ['fn','cv2.cvtColor','(frame, COLOR_BGR2GRAY)','Conversion en niveaux de gris.','Convert to grayscale.'],
+    ['fn','cv2.bitwise_not','(frame)','Inverse toutes les couleurs.','Invert every color.'],
+    ['fn','cv2.resize','(frame, fx=0.1, fy=0.1)','Pixelise la page (INTER_NEAREST).','Pixelate the page (INTER_NEAREST).'],
+    ['fn','cv2.reset','()','Annule les filtres et les boîtes.','Clears filters and boxes.'],
+    ['fun','matrix','','Pluie de code pendant quelques secondes.','Code rain for a few seconds.'],
+    ['fun','boom','','Explosions d’étincelles partout.','Sparks everywhere.'],
+    ['sys','help','','Liste les commandes.','List commands.'],
+    ['sys','help cv2','','Liste les fonctions cv2.','List cv2 functions.'],
+    ['sys','q','','Quitter. Enfin, essayer.','Quit. Or try to.'],
+  ];
+  // correspondance floue : sous-séquence, bonus préfixe / contigu / début de mot
+  function fuzzy(q,str){
+    const s2=str.toLowerCase(); q=q.toLowerCase(); if(!q) return {score:0,idx:[]};
+    let si=0,score=0,prev=-2,idx=[];
+    for(const ch of q){ if(ch===' '){const k=s2.indexOf(' ',si);if(k<0)return null;si=k;}
+      const k=s2.indexOf(ch,si); if(k<0) return null;
+      score+= k===prev+1?6:1; if(k===0)score+=8; if(k>0&&/[.\s_]/.test(s2[k-1]))score+=4;
+      idx.push(k); prev=k; si=k+1; }
+    return {score:score-str.length*.05,idx};
+  }
+  const sugEl=$('#sug'); let sugItems=[], sugSel=0;
+  function hl(name,idx){let o='';for(let i=0;i<name.length;i++){const c=name[i].replace(/&/g,'&amp;').replace(/</g,'&lt;');o+=idx.includes(i)?'<b>'+c+'</b>':c}return o}
+  function closeSug(){sugEl.hidden=true;sugItems=[];cmd.removeAttribute('aria-activedescendant')}
+  function updateSug(){
+    const v=cmd.value; if(!v.startsWith(':')||/[()]/.test(v)) return closeSug();
+    const q=v.slice(1).replace(/^cv\./i,'cv2.');
+    sugItems=CMDS.map(c=>({c,m:fuzzy(q,c[1])})).filter(x=>x.m).sort((a,b)=>b.m.score-a.m.score).slice(0,12);
+    if(!sugItems.length) return closeSug();
+    if(sugSel>=sugItems.length) sugSel=0;
+    renderSug();
+  }
+  function renderSug(){
+    const en=window.LANG==='en';
+    const rows=sugItems.map((x,i)=>{const [k,n,sig]=x.c;const [g,col]=IC[k];
+      return '<li id="sg'+i+'" role="option" data-i="'+i+'" class="'+(i===sugSel?'on':'')+'" aria-selected="'+(i===sugSel)+'"><span class="ic" style="--ic:'+col+'">'+g+'</span><span class="nm">'+hl(n,x.m.idx)+'</span><span class="sg">'+sig.replace(/</g,'&lt;')+'</span></li>'}).join('');
+    const c=sugItems[sugSel].c;
+    const kind={fn:'function',sec:'section',th:'theme',lang:'language',fun:'easter egg',sys:'command',mod:'module'}[c[0]];
+    sugEl.innerHTML='<ul>'+rows+'<li class="foot" aria-hidden="true">↑↓ · Tab '+(en?'complete':'compléter')+' · ↵ '+(en?'run':'lancer')+' · Esc</li></ul>'
+      +'<div class="doc"><code>'+(c[1].startsWith('cv2.')?c[1]+c[2]:c[1]+(c[2]?'  ('+c[2]+')':''))+'</code>'+(en?c[4]:c[3])+'<div class="ex">'+kind+'</div></div>';
+    sugEl.hidden=false; cmd.setAttribute('aria-activedescendant','sg'+sugSel);
+    const on=sugEl.querySelector('li.on'); on&&on.scrollIntoView({block:'nearest'});
+  }
+  function acceptSug(runIt){const x=sugItems[sugSel];if(!x)return false;cmd.value=':'+x.c[1];closeSug();if(runIt)run(cmd.value);return true}
+
   /* ---------- command line ---------- */
   const cmd=$('#cmdline');
-  function flash(m){cmd.value='';cmd.placeholder=m||':theme papier | nuit';cmd.blur();setMode('NORMAL')}
+  function flash(m){closeSug();cmd.value='';cmd.placeholder=m||':theme papier | nuit';cmd.blur();setMode('NORMAL')}
   function run(v){
     v=v.trim().replace(/^:/,'');const [c,arg]=v.split(/\s+/);
     if(/^(cv2?\.|import\s+cv2)/i.test(v)) return flash(cv2cmd(v));
@@ -885,12 +966,24 @@ document.getElementById('langBtn').addEventListener('click',()=>setLang(LANG==='
     if(c==='help') return flash(':theme <name> · :lang fr|en · :matrix · :boom · :help cv2');
     flash(t('badcmd')+v+' (:help)');
   }
-  cmd.addEventListener('focus',()=>setMode('COMMAND'));
-  cmd.addEventListener('blur',()=>setMode('NORMAL'));
-  cmd.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();run(cmd.value)}if(e.key==='Escape')flash('')});
+  cmd.addEventListener('focus',()=>{setMode('COMMAND');if(!cmd.value)cmd.value=':';sugSel=0;updateSug()});
+  cmd.addEventListener('blur',()=>{setMode('NORMAL');setTimeout(closeSug,120)});
+  cmd.addEventListener('input',()=>{sugSel=0;updateSug()});
+  cmd.addEventListener('keydown',e=>{
+    const open=!sugEl.hidden&&sugItems.length;
+    if(open&&(e.key==='ArrowDown'||e.key==='ArrowUp')){e.preventDefault();sugSel=(sugSel+(e.key==='ArrowDown'?1:-1)+sugItems.length)%sugItems.length;renderSug();return}
+    if(open&&e.key==='Tab'){e.preventDefault();acceptSug(false);return}
+    if(e.key==='Enter'){e.preventDefault();
+      const exact=open&&sugItems.some(x=>':'+x.c[1].toLowerCase()===cmd.value.trim().toLowerCase());
+      if(open&&!exact&&cmd.value.trim().length>1) return acceptSug(true);
+      closeSug();run(cmd.value);return}
+    if(e.key==='Escape'){e.preventDefault();if(open)return closeSug();flash('')}
+  });
+  sugEl.addEventListener('pointerdown',e=>{const li=e.target.closest('li[data-i]');e.preventDefault();if(!li)return;sugSel=+li.dataset.i;acceptSug(true)});
+  sugEl.addEventListener('pointermove',e=>{const li=e.target.closest('li[data-i]');if(li&&+li.dataset.i!==sugSel){sugSel=+li.dataset.i;renderSug()}});
   document.addEventListener('keydown',e=>{
     if(e.target===cmd||e.metaKey||e.ctrlKey||e.altKey)return;
-    if(e.key===':'){e.preventDefault();cmd.focus();cmd.value=':';return}
+    if(e.key===':'){e.preventDefault();cmd.value=':';cmd.focus();updateSug();return}
     if(e.key==='j')buf.scrollBy({top:90});else if(e.key==='k')buf.scrollBy({top:-90});
     else if(e.key==='g')buf.scrollTo({top:0});else if(e.key==='G')buf.scrollTo({top:buf.scrollHeight});
     else if(/^[1-5]$/.test(e.key))jump(secs[+e.key-1]);

@@ -12,7 +12,8 @@ Site statique, un seul fichier, aucune étape de build : un portfolio en forme d
 ### Raccourcis du site
 
 - `j` / `k` : défiler · `g` / `G` : haut / bas · `1`–`5` : sauter à une section
-- `:` ouvre la ligne de commande : `:theme papier|nuit`, `:lang fr|en`, `:matrix`, `:boom`, `:help`
+- `:` ouvre la ligne de commande avec une boîte de suggestions façon IDE : recherche floue (`:cvcan` → `cv2.Canny`), `↑` `↓` pour choisir, `Tab` pour compléter, `Entrée` pour lancer, `Échap` pour fermer. Le panneau de droite décrit la commande sélectionnée.
+- Commandes disponibles : `:theme papier|nuit`, `:lang fr|en`, `:matrix`, `:boom`, `:help`
 - Commandes OpenCV (`:help cv2`) : `:cv2.Canny`, `:cv2.Sobel`, `:cv2.GaussianBlur`, `:cv2.threshold`, `:cv2.cvtColor`, `:cv2.bitwise_not`, `:cv2.resize` filtrent toute la page ; `:cv2.detect` encadre les éléments visibles avec des boîtes de détection ; `:cv2.track` suit le curseur ; `:cv2.reset` remet tout. La syntaxe complète marche aussi : `:cv2.Canny(page, 100, 200)`, `:import cv2`.
 - Thème : **papier** (clair) ou **nuit** (sombre). Par défaut, suit le réglage clair/sombre de l'appareil ; un clic sur ☀ / ☾ mémorise le choix.
 - Bouton **FR / EN** en bas à droite (choix mémorisé dans le navigateur)
