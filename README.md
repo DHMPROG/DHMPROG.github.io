@@ -1,14 +1,19 @@
 # Portfolio — Amine Dahmane
 
-Site statique (aucune étape de build) exporté de Claude Design.
+Site statique, un seul fichier, aucune étape de build : un portfolio en forme d'éditeur de code (arborescence, barre d'état vim, ligne de commande).
 
 | Fichier | Rôle |
 |---|---|
-| `index.html` | Le portfolio |
-| `support.js` | Runtime Claude Design (charge React depuis unpkg) — ne pas modifier |
-| `data/experiences.json` | **Tes expériences** — lues par `index.html` au chargement |
-| `admin.html` | Mini CRUD pour gérer `data/experiences.json` |
-| `assets/` | Logo |
+| `index.html` | Le portfolio (HTML, CSS et JS dans un seul fichier, aucune dépendance) |
+| `data/experiences.json` | **Tes expériences** — lues par `index.html` au chargement, affichées dans `log.txt` |
+| `admin.html` | Mini CRUD pour gérer `data/experiences.json` (local seulement) |
+| `assets/` | Logo et CV (FR et EN) |
+
+### Raccourcis du site
+
+- `j` / `k` : défiler · `g` / `G` : haut / bas · `1`–`5` : sauter à une section
+- `:` ouvre la ligne de commande : `:theme braise|nuit|papier`, `:lang fr|en`, `:matrix`, `:boom`, `:help`
+- Bouton **FR / EN** en bas à droite (choix mémorisé dans le navigateur)
 
 ## Gérer les expériences
 
@@ -44,7 +49,7 @@ Format d'une expérience :
 
 Le bloc `en` est optionnel : il est affiché quand le visiteur choisit **EN** (bouton FR / EN du menu). Un champ absent reprend la version française.
 
-Les autres textes du site (FR et EN) sont dans `index.html`, objet `I18N` du composant.
+Les autres textes du site (FR et EN) sont dans `index.html`, objet `window.I18N` (clés `fr` et `en`). La session de stage est la clé `session`.
 
 ## Tester en local
 
