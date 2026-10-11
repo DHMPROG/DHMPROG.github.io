@@ -6,7 +6,8 @@
 <title>Amine Dahmane — Portfolio</title>
 <meta name="description" content="Amine Dahmane — étudiant en génie logiciel à Montréal. Full-stack et mobile : Next.js, TypeScript, iOS. Recherche un stage pour l'hiver 2027.">
 <meta name="author" content="Amine Dahmane">
-<meta name="theme-color" content="#121212">
+<meta name="theme-color" content="#0d1117" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f4f1" media="(prefers-color-scheme: light)">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Amine Dahmane — Portfolio">
 <meta property="og:description" content="Étudiant en génie logiciel à Montréal. App iOS sur l'App Store, 216 utilisateurs. Recherche un stage, hiver 2027.">
@@ -20,13 +21,14 @@
 <style>
 /* Layout: an editor window — boot screen, file tree, one buffer with a gutter, an interactive character field in the hero, a live demo per project, stack marquee, vim status + command line. */
 :root{
-  --bg:#121212; --panel:#191919; --line:#2a2a2a; --fg:#ececec; --dim:#8a8a8a;
-  --accent:#ff7a45; --accent2:#5fd4b5; --third:#f5c84b; --sel:#3a2418;
+  --bg:#0d1117; --panel:#131a23; --line:#223040; --fg:#dbe6f0; --dim:#7b8ea3;
+  --accent:#7aa2ff; --accent2:#c792ea; --third:#5fd4b5; --sel:#1d2b45;
   --f-display:"Martian Mono",ui-monospace,monospace;
   --f-body:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
   color-scheme:dark;
 }
 html[data-palette="nuit"]{--bg:#0d1117;--panel:#131a23;--line:#223040;--fg:#dbe6f0;--dim:#7b8ea3;--accent:#7aa2ff;--accent2:#c792ea;--third:#5fd4b5;--sel:#1d2b45;color-scheme:dark}
+@media (prefers-color-scheme:light){:root:not([data-palette="nuit"]){--bg:#f4f4f1;--panel:#eaeae5;--line:#d6d6cf;--fg:#151515;--dim:#6b6b66;--accent:#e2552a;--accent2:#1f7a64;--third:#b0801a;--sel:#f7d6c6;color-scheme:light}}
 html[data-palette="papier"]{--bg:#f4f4f1;--panel:#eaeae5;--line:#d6d6cf;--fg:#151515;--dim:#6b6b66;--accent:#e2552a;--accent2:#1f7a64;--third:#b0801a;--sel:#f7d6c6;color-scheme:light}
 *{box-sizing:border-box}
 html,body{height:100%}
@@ -417,13 +419,12 @@ h2.sec.yank{animation:yank .9s ease-out}
     <span class="prog" id="prog"></span>
   </div>
   <div class="cmd">
-    <input id="cmdline" aria-label="Command line" placeholder=":theme braise | nuit | papier" autocomplete="off" spellcheck="false">
+    <input id="cmdline" aria-label="Command line" placeholder=":theme papier | nuit" autocomplete="off" spellcheck="false">
     <span class="hint"><kbd>j</kbd>/<kbd>k</kbd> scroll · <kbd>1–5</kbd> jump · <kbd>:</kbd> command</span>
     <button type="button" class="lang" id="langBtn" aria-label="Switch to English"><b data-l="fr">FR</b> / <b data-l="en">EN</b></button>
     <div class="themes" role="group" aria-label="Theme">
-      <button type="button" data-p="braise" aria-pressed="true">braise</button>
-      <button type="button" data-p="nuit" aria-pressed="false">nuit</button>
-      <button type="button" data-p="papier" aria-pressed="false">papier</button>
+      <button type="button" data-p="papier" aria-pressed="false" title="mode clair">☀ papier</button>
+      <button type="button" data-p="nuit" aria-pressed="false" title="mode sombre">☾ nuit</button>
     </div>
   </div>
 </div>
@@ -731,22 +732,28 @@ document.getElementById('langBtn').addEventListener('click',()=>setLang(LANG==='
 
   /* ---------- themes ---------- */
   const wipe=$('#wipe');
-  function setPalette(p,anim){
-    if(!['braise','nuit','papier'].includes(p))return false;
+  const LIGHT=matchMedia('(prefers-color-scheme: light)');
+  const sysPalette=()=>LIGHT.matches?'papier':'nuit';
+  function setPalette(p,anim,save=true){
+    if(p==='clair'||p==='light')p='papier'; if(p==='sombre'||p==='dark')p='nuit';
+    if(!['nuit','papier'].includes(p))return false;
     const apply=()=>{document.documentElement.dataset.palette=p;$$('.themes button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.p===p))};
     if(anim&&!RM){wipe.classList.remove('go');void wipe.offsetWidth;wipe.classList.add('go');setTimeout(apply,330)}else apply();
-    try{localStorage.setItem('palette',p)}catch(e){}
+    if(save){try{localStorage.setItem('palette',p)}catch(e){}}
     return true;
   }
-  try{const s=localStorage.getItem('palette');if(s)setPalette(s,false)}catch(e){}
+  let saved=null; try{saved=localStorage.getItem('palette')}catch(e){}
+  if(saved!=='nuit'&&saved!=='papier') saved=null;
+  setPalette(saved||sysPalette(),false,false);
+  LIGHT.addEventListener&&LIGHT.addEventListener('change',()=>{let s=null;try{s=localStorage.getItem('palette')}catch(e){} if(s!=='nuit'&&s!=='papier')setPalette(sysPalette(),true,false)});
   $$('.themes button').forEach(b=>b.addEventListener('click',()=>setPalette(b.dataset.p,true)));
 
   /* ---------- command line ---------- */
   const cmd=$('#cmdline');
-  function flash(m){cmd.value='';cmd.placeholder=m||':theme braise | nuit | papier';cmd.blur();setMode('NORMAL')}
+  function flash(m){cmd.value='';cmd.placeholder=m||':theme papier | nuit';cmd.blur();setMode('NORMAL')}
   function run(v){
     v=v.trim().replace(/^:/,'');const [c,arg]=v.split(/\s+/);
-    if(c==='theme'||c==='colo'||c==='colorscheme') return flash(setPalette(arg,true)?'theme → '+arg:'E185: no theme "'+(arg||'')+'". try braise, nuit, papier');
+    if(c==='theme'||c==='colo'||c==='colorscheme') return flash(setPalette(arg,true)?'theme → '+arg:'E185: no theme "'+(arg||'')+'". try papier, nuit');
     if(names[c]){jump(document.getElementById(c));return flash('')}
     if(c==='matrix'){rain(true);return flash(t('wake'))}
     if(c==='boom'){for(let i=0;i<6;i++)setTimeout(()=>dispatchEvent(new PointerEvent('pointerdown',{clientX:Math.random()*innerWidth,clientY:Math.random()*innerHeight})),i*120);return flash('💥')}

@@ -12,7 +12,8 @@ Site statique, un seul fichier, aucune étape de build : un portfolio en forme d
 ### Raccourcis du site
 
 - `j` / `k` : défiler · `g` / `G` : haut / bas · `1`–`5` : sauter à une section
-- `:` ouvre la ligne de commande : `:theme braise|nuit|papier`, `:lang fr|en`, `:matrix`, `:boom`, `:help`
+- `:` ouvre la ligne de commande : `:theme papier|nuit`, `:lang fr|en`, `:matrix`, `:boom`, `:help`
+- Thème : **papier** (clair) ou **nuit** (sombre). Par défaut, suit le réglage clair/sombre de l'appareil ; un clic sur ☀ / ☾ mémorise le choix.
 - Bouton **FR / EN** en bas à droite (choix mémorisé dans le navigateur)
 
 ## Gérer les expériences
