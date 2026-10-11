@@ -268,6 +268,27 @@ h2.sec.yank{animation:yank .9s ease-out}
 .sug .doc .ex{color:var(--dim);margin-top:.45rem}
 .sug .foot{padding:.25rem .7rem;border-top:1px solid var(--line);color:var(--dim);font-size:11px}
 @media (max-width:760px){.sug{left:0;right:0;flex-direction:column;padding-inline:.5rem}.sug ul{width:100%}.sug .doc{width:100%;margin:-1px 0 0}}
+/* thème secret (konami) */
+html[data-palette="arcade"]{--bg:#0b0221;--panel:#140533;--line:#2b1055;--fg:#f5e9ff;--dim:#9a7fc9;--accent:#ff2fd6;--accent2:#22f2ff;--third:#ffe14d;--sel:#3a0f5e;color-scheme:dark}
+/* terminal flottant, QR, cast */
+.term-x{display:none;margin-left:.6rem;background:none;border:0;color:var(--dim);font:inherit;font-size:14px;cursor:pointer;padding:0 .2rem}
+.term-x:hover{color:var(--accent)}
+.term.float{display:block!important;position:fixed;z-index:17;left:50%;top:46%;transform:translate(-50%,-50%);width:min(620px,calc(100vw - 2rem));animation:pop .22s cubic-bezier(.2,.9,.3,1.2)}
+.term.float:hover{transform:translate(-50%,-50%)}
+.term.float .term-x{display:inline}
+.term.float pre{min-height:12em;max-height:62vh;overflow:auto}
+@keyframes pop{from{opacity:0;transform:translate(-50%,-46%) scale(.96)}to{opacity:1}}
+.term pre .ok{color:var(--accent2)} .term pre .bar{color:var(--accent)} .term pre .hd{background:var(--accent);color:var(--bg)}
+.scrim{position:fixed;inset:0;z-index:16;background:color-mix(in srgb,var(--bg) 55%,transparent);backdrop-filter:blur(2px);animation:sugin .2s}
+.qrbox{position:fixed;z-index:17;left:50%;top:50%;transform:translate(-50%,-50%);background:var(--panel);border:1px solid var(--line);padding:1.2rem;display:grid;gap:.7rem;justify-items:center;animation:pop .25s cubic-bezier(.2,.9,.3,1.2);font-size:12.5px;color:var(--dim);text-align:center}
+.qrbox canvas{width:min(260px,70vw);height:auto;image-rendering:pixelated;background:#fff;padding:10px}
+.qrbox b{color:var(--fg);font-weight:500}
+.win{transition:transform .7s cubic-bezier(.7,0,.2,1),border-radius .7s,box-shadow .7s}
+.win.casting{transform:scale(.62) translateY(-6%);border-radius:22px;overflow:hidden;box-shadow:0 0 0 14px var(--panel),0 0 0 15px var(--line),0 40px 90px -30px var(--accent)}
+.castfx{position:fixed;left:50%;bottom:9%;transform:translateX(-50%);z-index:17;color:var(--fg);font-size:13px;display:flex;gap:.7rem;align-items:center;white-space:nowrap}
+.castfx i{width:8px;height:8px;border-radius:50%;background:var(--accent2);animation:ping 1.2s infinite}
+.hire{animation:hire 1.6s ease-out 2}
+@keyframes hire{0%{box-shadow:0 0 0 0 var(--accent)}100%{box-shadow:0 0 0 18px transparent}}
 /* terminal du hero */
 .hero-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:clamp(2rem,4vw,5rem);align-items:center}
 .term{display:none;border:1px solid var(--line);background:color-mix(in srgb,var(--panel) 88%,transparent);backdrop-filter:blur(6px);box-shadow:0 30px 60px -40px var(--accent);transition:transform .4s cubic-bezier(.2,.7,.2,1)}
@@ -360,8 +381,8 @@ body{font-size:clamp(14px,.35vw + 8.5px,17px)}
         </ul>
         <p class="hint-field" data-i18n="hint">↖ le fond réagit à ton curseur. clique n'importe où.</p>
         </div>
-        <div class="term" aria-hidden="true">
-          <div class="term-bar"><i></i><i></i><i></i><span>zsh — ~/amine</span></div>
+        <div class="term" id="term">
+          <div class="term-bar"><i></i><i></i><i></i><span>zsh — ~/amine</span><button class="term-x" id="termX" type="button" aria-label="Fermer">×</button></div>
           <pre id="termOut"></pre>
         </div></div>
       </div>
@@ -507,6 +528,8 @@ body{font-size:clamp(14px,.35vw + 8.5px,17px)}
   <filter id="cv-canny" color-interpolation-filters="sRGB"><feColorMatrix type="saturate" values="0"/><feConvolveMatrix order="3" kernelMatrix="-1 -1 -1 -1 8 -1 -1 -1 -1" preserveAlpha="true"/><feComponentTransfer><feFuncR type="linear" slope="4"/><feFuncG type="linear" slope="4"/><feFuncB type="linear" slope="4"/></feComponentTransfer></filter>
   <filter id="cv-sobel" color-interpolation-filters="sRGB"><feColorMatrix type="saturate" values="0"/><feConvolveMatrix order="3" kernelMatrix="-1 -2 0 -2 0 2 0 2 1" bias="0.5" preserveAlpha="true"/></filter>
   <filter id="cv-thresh" color-interpolation-filters="sRGB"><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncR type="discrete" tableValues="0 1"/><feFuncG type="discrete" tableValues="0 1"/><feFuncB type="discrete" tableValues="0 1"/></feComponentTransfer></filter>
+  <filter id="cv-dilate"><feMorphology operator="dilate" radius="1.2"/></filter>
+  <filter id="cv-erode"><feMorphology operator="erode" radius=".6"/></filter>
   <filter id="cv-pixel" x="0" y="0" width="100%" height="100%"><feFlood x="3" y="3" height="2" width="2"/><feComposite width="8" height="8"/><feTile result="a"/><feComposite in="SourceGraphic" in2="a" operator="in"/><feMorphology operator="dilate" radius="4"/></filter>
 </svg>
 <div id="cvLayer" aria-hidden="true"></div>
@@ -734,14 +757,18 @@ document.getElementById('langBtn').addEventListener('click',()=>setLang(LANG==='
   /* ---------- seats demo ---------- */
   const seatsEl=$('#seats'), seats=[];
   for(let i=0;i<20;i++){const d=document.createElement('div');d.className='seat on';seatsEl.appendChild(d);seats.push(d)}
-  function seatRun(){
-    if(RM) return; seats.forEach(s=>s.classList.remove('on')); let req=0,got=0;
-    const st=$('#sStatus'); st.textContent=t('openS'); st.className='';
-    const tick=()=>{req++;$('#sReq').textContent=req;
+  let seatTok=0;
+  function seatRun(n,onDone){
+    n=n||30; const tok=++seatTok; const st=$('#sStatus');
+    if(RM){const got=Math.min(20,n);seats.forEach((s,i)=>s.classList.toggle('on',i<got));$('#sReq').textContent=n;$('#sSpots').textContent=got;$('#sWait').textContent=Math.max(0,n-20);onDone&&onDone(got,n);return}
+    seats.forEach(s=>s.classList.remove('on')); let req=0,got=0;
+    st.textContent=t('openS'); st.className='';
+    const tick=()=>{ if(tok!==seatTok) return; req++;$('#sReq').textContent=req;
       if(got<20){const s=seats[got++];s.classList.add('flash');setTimeout(()=>{s.classList.remove('flash');s.classList.add('on')},140)}
       $('#sSpots').textContent=got;$('#sWait').textContent=Math.max(0,req-20);
       if(got===20){st.textContent=t('full');st.className='full'}
-      if(req<30)setTimeout(tick,60+Math.random()*130);else setTimeout(seatRun,3200)};
+      if(req<n)setTimeout(tick,n>=25?45:60+Math.random()*130);
+      else{onDone&&onDone(got,req);setTimeout(()=>{if(tok===seatTok)seatRun()},3200)}};
     setTimeout(tick,500);
   }
 
@@ -817,7 +844,7 @@ document.getElementById('langBtn').addEventListener('click',()=>setLang(LANG==='
   const sysPalette=()=>LIGHT.matches?'papier':'nuit';
   function setPalette(p,anim,save=true){
     if(p==='clair'||p==='light')p='papier'; if(p==='sombre'||p==='dark')p='nuit';
-    if(!['nuit','papier'].includes(p))return false;
+    if(!['nuit','papier','arcade'].includes(p))return false;
     const apply=()=>{document.documentElement.dataset.palette=p;$$('.themes button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.p===p))};
     if(anim&&!RM){wipe.classList.remove('go');void wipe.offsetWidth;wipe.classList.add('go');setTimeout(apply,330)}else apply();
     if(save){try{localStorage.setItem('palette',p)}catch(e){}}
@@ -831,7 +858,7 @@ document.getElementById('langBtn').addEventListener('click',()=>setLang(LANG==='
 
   /* ---------- cv2 : filtres et détection ---------- */
   const winEl=$('.win'), layer=$('#cvLayer');
-  const CVF={canny:'url(#cv-canny)',sobel:'url(#cv-sobel)',gaussianblur:'blur(4px)',blur:'blur(4px)',threshold:'url(#cv-thresh)',cvtcolor:'grayscale(1)',gray:'grayscale(1)',bitwise_not:'invert(1) hue-rotate(180deg)',invert:'invert(1) hue-rotate(180deg)',resize:'url(#cv-pixel)',pixelate:'url(#cv-pixel)'};
+  const CVF={canny:'url(#cv-canny)',sobel:'url(#cv-sobel)',gaussianblur:'blur(4px)',blur:'blur(4px)',threshold:'url(#cv-thresh)',cvtcolor:'grayscale(1)',gray:'grayscale(1)',bitwise_not:'invert(1) hue-rotate(180deg)',invert:'invert(1) hue-rotate(180deg)',resize:'url(#cv-pixel)',pixelate:'url(#cv-pixel)',dilate:'url(#cv-dilate)',erode:'url(#cv-erode)'};
   const CVMSG={
     canny:()=>'>>> cv2.Canny(frame, 100, 200) → edges '+innerWidth+'×'+innerHeight,
     sobel:()=>'>>> cv2.Sobel(frame, cv2.CV_64F, 1, 1, ksize=3) → gradient map',
@@ -841,6 +868,8 @@ document.getElementById('langBtn').addEventListener('click',()=>setLang(LANG==='
     bitwise_not:()=>'>>> cv2.bitwise_not(frame)', invert:()=>'>>> cv2.bitwise_not(frame)',
     resize:()=>'>>> cv2.resize(frame, None, fx=0.1, fy=0.1, interpolation=cv2.INTER_NEAREST)', pixelate:()=>'>>> cv2.resize(frame, None, fx=0.1, fy=0.1, interpolation=cv2.INTER_NEAREST)'
   };
+  CVMSG.dilate=()=>'>>> cv2.dilate(frame, np.ones((3, 3)), iterations=1)';
+  CVMSG.erode=()=>'>>> cv2.erode(frame, np.ones((2, 2)), iterations=1)';
   let cvBoxes=[], trackOn=false, trackEl=null, tx=0, ty=0;
   function clearBoxes(){cvBoxes.forEach(b=>b.remove());cvBoxes=[]}
   buf.addEventListener('scroll',()=>{if(cvBoxes.length)clearBoxes()},{passive:true});
@@ -880,15 +909,23 @@ document.getElementById('langBtn').addEventListener('click',()=>setLang(LANG==='
     if(/^import\s+cv2/i.test(raw)) return '>>> import cv2  # ok. try :cv2.detect · :cv2.Canny · :help cv2';
     const name=raw.replace(/^cv2?\./i,'').replace(/\(.*$/,'').trim().toLowerCase();
     if(CVF[name]){clearBoxes();cvFilter(CVF[name]);return CVMSG[name]()}
-    if(name==='detect'||name==='dnn'||name==='face_detect'){return detect()}
+    if(name==='face_detect'||name==='cascadeclassifier'){return faceDetect()}
+    if(name==='detect'||name==='dnn'){return detect()}
     if(name==='track'||name==='tracker'){return track()}
     if(name==='reset'||name==='destroyallwindows'){cvFilter('');clearBoxes();if(trackOn)track();return '>>> cv2.destroyAllWindows()  # frame restored'}
     return 'cv2.error: (-215) unknown function "'+name+'". try :help cv2';
   }
-  const CV_HELP='cv2: .Canny .Sobel .GaussianBlur .threshold .cvtColor .bitwise_not .resize .detect .track .reset';
+  function faceDetect(){
+    clearBoxes(); const r=$('#name').getBoundingClientRect();
+    const scan=document.createElement('div');scan.className='cvscan';layer.appendChild(scan);cvBoxes.push(scan);
+    const b=document.createElement('div');b.className='cvbox';Object.assign(b.style,{left:(r.left-6)+'px',top:(r.top-6)+'px',width:(r.width+12)+'px',height:(r.height+12)+'px'});
+    b.style.setProperty('--c','var(--third)');b.style.setProperty('--d','.6s');b.innerHTML='<span>face: not found 0.12</span>';layer.appendChild(b);cvBoxes.push(b);
+    return ">>> cv2.CascadeClassifier('haarcascade_frontalface.xml') → 0 faces. it's a portfolio, not a selfie. try :cv2.detect";
+  }
+  const CV_HELP='cv2: .Canny .Sobel .GaussianBlur .threshold .cvtColor .bitwise_not .resize .dilate .erode .detect .face_detect .track .reset';
 
   /* ---------- autocomplétion (catalogue des commandes) ---------- */
-  const IC={fn:['ƒ','var(--accent2)'],sec:['§','var(--third)'],th:['◐','var(--accent)'],lang:['A','var(--accent)'],fun:['★','var(--third)'],sys:['?','var(--dim)'],mod:['⇣','var(--accent2)']};
+  const IC={act:['↗','var(--accent2)'],term:['›','var(--accent)'],game:['◆','var(--third)'],fn:['ƒ','var(--accent2)'],sec:['§','var(--third)'],th:['◐','var(--accent)'],lang:['A','var(--accent)'],fun:['★','var(--third)'],sys:['?','var(--dim)'],mod:['⇣','var(--accent2)']};
   const CMDS=[
     ['sec','readme','','Aller à l’intro.','Jump to the intro.'],
     ['sec','projects','','Aller aux projets.','Jump to projects.'],
@@ -910,6 +947,34 @@ document.getElementById('langBtn').addEventListener('click',()=>setLang(LANG==='
     ['fn','cv2.bitwise_not','(frame)','Inverse toutes les couleurs.','Invert every color.'],
     ['fn','cv2.resize','(frame, fx=0.1, fy=0.1)','Pixelise la page (INTER_NEAREST).','Pixelate the page (INTER_NEAREST).'],
     ['fn','cv2.reset','()','Annule les filtres et les boîtes.','Clears filters and boxes.'],
+    ['act','cv','pdf','Ouvre mon CV (PDF) dans la langue du site.','Opens my résumé (PDF) in the site language.'],
+    ['act','mail','copy','Copie mon courriel dans le presse-papiers.','Copies my email to the clipboard.'],
+    ['act','open heros','mtlherosduterrain.org','Ouvre le site de MTL Héros du Terrain.','Opens the MTL Héros du Terrain site.'],
+    ['act','open appstore','iOS','Ouvre l’app sur l’App Store.','Opens the app on the App Store.'],
+    ['act','open nest','github','Ouvre le repo nest-deck.','Opens the nest-deck repo.'],
+    ['act','open abdian','github','Ouvre le repo Abdian.','Opens the Abdian repo.'],
+    ['act','open github','DHMPROG','Ouvre mon profil GitHub.','Opens my GitHub profile.'],
+    ['act','open linkedin','dahmane','Ouvre mon LinkedIn.','Opens my LinkedIn.'],
+    ['term','whoami','--json','Retape ma fiche dans le terminal.','Retypes my profile in the terminal.'],
+    ['term','stats','','Mon bilan en chiffres, dans le terminal.','My numbers, in the terminal.'],
+    ['term','book 20','[requests]','Lance un vrai test de concurrence sur la démo des places : N requêtes pour 20 places, 0 surréservation.','Runs a concurrency test on the seats demo: N requests for 20 spots, zero overbooking.'],
+    ['act','qr','','Génère un QR code vers ce portfolio, à scanner avec un téléphone.','Draws a QR code to this portfolio to scan with a phone.'],
+    ['act','cast','nest hub','Envoie la page vers un Nest Hub (simulé), clin d’œil à nest-deck.','Casts the page to a Nest Hub (simulated), a nod to nest-deck.'],
+    ['term','git log','--oneline','Les vrais derniers commits de ce site, en direct de GitHub.','The real latest commits of this site, live from GitHub.'],
+    ['term','ls','-la','Liste les fichiers du portfolio.','Lists the portfolio files.'],
+    ['term','cat README.md','','Affiche l’intro dans le terminal.','Prints the intro in the terminal.'],
+    ['term','cat projects','','Résumé des projets.','Project summary.'],
+    ['term','cat log.txt','','Mon expérience.','My experience.'],
+    ['term','cat stack.toml','','Mes compétences, en TOML.','My skills, as TOML.'],
+    ['term','cat contact.sh','','Comment me joindre.','How to reach me.'],
+    ['term','top','','Moniteur système façon htop, avec mes projets comme processus. q pour quitter.','An htop-style monitor with my projects as processes. q to quit.'],
+    ['game','snake','','Un snake dans le terminal. Flèches ou WASD, glisser sur mobile.','Snake in the terminal. Arrows or WASD, swipe on mobile.'],
+    ['game','sudo hire amine','','La commande que tout recruteur devrait taper.','The command every recruiter should run.'],
+    ['game','coffee','','Une tasse ASCII qui se remplit.','An ASCII cup filling up.'],
+    ['game','konami','','Un indice pour débloquer le thème secret.','A hint to unlock the secret theme.'],
+    ['fn','cv2.face_detect','(frame)','Cherche un visage. Spoiler : c’est un portfolio.','Looks for a face. Spoiler: it’s a portfolio.'],
+    ['fn','cv2.dilate','(frame, kernel)','Dilatation morphologique : tout le texte s’épaissit.','Morphological dilation: all text gets bolder.'],
+    ['fn','cv2.erode','(frame, kernel)','Érosion morphologique : tout le texte s’amincit.','Morphological erosion: all text gets thinner.'],
     ['fun','matrix','','Pluie de code pendant quelques secondes.','Code rain for a few seconds.'],
     ['fun','boom','','Explosions d’étincelles partout.','Sparks everywhere.'],
     ['sys','help','','Liste les commandes.','List commands.'],
@@ -942,7 +1007,7 @@ document.getElementById('langBtn').addEventListener('click',()=>setLang(LANG==='
     const rows=sugItems.map((x,i)=>{const [k,n,sig]=x.c;const [g,col]=IC[k];
       return '<li id="sg'+i+'" role="option" data-i="'+i+'" class="'+(i===sugSel?'on':'')+'" aria-selected="'+(i===sugSel)+'"><span class="ic" style="--ic:'+col+'">'+g+'</span><span class="nm">'+hl(n,x.m.idx)+'</span><span class="sg">'+sig.replace(/</g,'&lt;')+'</span></li>'}).join('');
     const c=sugItems[sugSel].c;
-    const kind={fn:'function',sec:'section',th:'theme',lang:'language',fun:'easter egg',sys:'command',mod:'module'}[c[0]];
+    const kind={act:'action',term:'terminal',game:'game',fn:'function',sec:'section',th:'theme',lang:'language',fun:'easter egg',sys:'command',mod:'module'}[c[0]];
     sugEl.innerHTML='<ul>'+rows+'<li class="foot" aria-hidden="true">↑↓ · Tab '+(en?'complete':'compléter')+' · ↵ '+(en?'run':'lancer')+' · Esc</li></ul>'
       +'<div class="doc"><code>'+(c[1].startsWith('cv2.')?c[1]+c[2]:c[1]+(c[2]?'  ('+c[2]+')':''))+'</code>'+(en?c[4]:c[3])+'<div class="ex">'+kind+'</div></div>';
     sugEl.hidden=false; cmd.setAttribute('aria-activedescendant','sg'+sugSel);
@@ -957,13 +1022,14 @@ document.getElementById('langBtn').addEventListener('click',()=>setLang(LANG==='
     v=v.trim().replace(/^:/,'');const [c,arg]=v.split(/\s+/);
     if(/^(cv2?\.|import\s+cv2)/i.test(v)) return flash(cv2cmd(v));
     if(c==='help'&&arg==='cv2') return flash(CV_HELP);
+    {const r=ext(v,c,arg); if(r!==undefined) return flash(r);}
     if(c==='theme'||c==='colo'||c==='colorscheme') return flash(setPalette(arg,true)?'theme → '+arg:'E185: no theme "'+(arg||'')+'". try papier, nuit');
     if(names[c]){jump(document.getElementById(c));return flash('')}
     if(c==='matrix'){rain(true);return flash(t('wake'))}
     if(c==='boom'){for(let i=0;i<6;i++)setTimeout(()=>dispatchEvent(new PointerEvent('pointerdown',{clientX:Math.random()*innerWidth,clientY:Math.random()*innerHeight})),i*120);return flash('💥')}
     if(c==='q'||c==='wq'||c==='q!') return flash(t('quit'));
     if(c==='lang'){const ok=setLang(arg);if(ok)typeTerm();return flash(ok?'lang → '+arg:'lang: fr | en')}
-    if(c==='help') return flash(':theme <name> · :lang fr|en · :matrix · :boom · :help cv2');
+    if(c==='help'){helpTerm();return flash(':help → terminal · :help cv2')}
     flash(t('badcmd')+v+' (:help)');
   }
   cmd.addEventListener('focus',()=>{setMode('COMMAND');if(!cmd.value)cmd.value=':';sugSel=0;updateSug()});
@@ -974,8 +1040,10 @@ document.getElementById('langBtn').addEventListener('click',()=>setLang(LANG==='
     if(open&&(e.key==='ArrowDown'||e.key==='ArrowUp')){e.preventDefault();sugSel=(sugSel+(e.key==='ArrowDown'?1:-1)+sugItems.length)%sugItems.length;renderSug();return}
     if(open&&e.key==='Tab'){e.preventDefault();acceptSug(false);return}
     if(e.key==='Enter'){e.preventDefault();
-      const exact=open&&sugItems.some(x=>':'+x.c[1].toLowerCase()===cmd.value.trim().toLowerCase());
-      if(open&&!exact&&cmd.value.trim().length>1) return acceptSug(true);
+      const val=cmd.value.trim(), body=val.replace(/^:/,''), first=body.split(/\s+/)[0].toLowerCase();
+      const exact=open&&sugItems.some(x=>':'+x.c[1].toLowerCase()===val.toLowerCase());
+      const withArgs=/\s\S/.test(body)&&CMDS.some(c=>c[1].split(' ')[0].toLowerCase()===first);
+      if(open&&!exact&&!withArgs&&val.length>1) return acceptSug(true);
       closeSug();run(cmd.value);return}
     if(e.key==='Escape'){e.preventDefault();if(open)return closeSug();flash('')}
   });
@@ -991,9 +1059,9 @@ document.getElementById('langBtn').addEventListener('click',()=>setLang(LANG==='
 
   /* ---------- copy ---------- */
   $('#copyMail').addEventListener('click',function(){
-    const b=this,t=$('#mail').textContent,done=()=>{b.textContent=t('copied');setTimeout(()=>b.textContent=t('copy'),1400)};
+    const b=this,txt=$('#mail').textContent,done=()=>{b.textContent=t('copied');setTimeout(()=>b.textContent=t('copy'),1400)};
     const sel=()=>{const r=document.createRange();r.selectNodeContents($('#mail'));const s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent=t('selected')};
-    try{navigator.clipboard.writeText(t).then(done,sel)}catch(e){sel()}
+    try{navigator.clipboard.writeText(txt).then(done,sel)}catch(e){sel()}
   });
 
   /* ---------- terminal du hero ---------- */
@@ -1010,9 +1078,7 @@ document.getElementById('langBtn').addEventListener('click',()=>setLang(LANG==='
       ['k','  "stack"'],['',': ['],['s','"TS"'],['',', '],['s','"Python"'],['',', '],['s','"Swift-ish"'],['','],\n'],
       ['k','  "coffee"'],['',': '],['s','true'],['','\n}\n'],
       ['p','$ '],['','git log --oneline -3\n'],
-      ['s','8a0148a'],['',' '+(L?'full-screen 16:9 layout':'plein écran 16:9')+'\n'],
-      ['s','cd6e9d6'],['',' '+(L?'theme: papier light, nuit dark':'thème : papier en clair, nuit en sombre')+'\n'],
-      ['s','1c1ecee'],['',' '+(L?'new animated editor portfolio':'nouveau portfolio éditeur animé')+'\n'],
+      ...((window.COMMITS&&window.COMMITS.length)?window.COMMITS.slice(0,3).flatMap(c=>[['s',c.h],['',' '+c.m.slice(0,48)+'\n']]):[['c','(github api offline)\n']]),
       ['p','$ '],
     ];
   }
@@ -1035,9 +1101,218 @@ document.getElementById('langBtn').addEventListener('click',()=>setLang(LANG==='
   }
   document.getElementById('langBtn').addEventListener('click',()=>setTimeout(typeTerm,0));
 
+  /* ---------- commandes étendues ---------- */
+  const termEl=$('#term'), termOut=$('#termOut');
+  let termTimer=null, termMode=null, termFloat=false, termHome=null;
+  const E=x=>String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  const S=(c,x)=>'<span class="'+c+'">'+E(x)+'</span>';
+  const pad=(x,n)=>{x=String(x);return x.length>=n?x:x+' '.repeat(n-x.length)};
+  function termStop(){clearInterval(termTimer);clearTimeout(termTimer);termTimer=null;termMode=null}
+  function termOpen(){
+    const hidden=getComputedStyle(termEl).display==='none' && !termEl.classList.contains('float');
+    const away=buf.scrollTop>secs[0].offsetHeight*.45;
+    if(hidden||away||termEl.classList.contains('float')){
+      if(!termFloat){termFloat=true;termHome=[termEl.parentNode,termEl.nextSibling];document.body.appendChild(termEl);termEl.classList.add('float');const sc=document.createElement('div');sc.className='scrim';sc.id='termScrim';sc.addEventListener('click',termClose);document.body.appendChild(sc);}
+    }
+  }
+  function termClose(){termStop();termRun++;termFloat=false;termEl.classList.remove('float');if(termHome){termHome[0].insertBefore(termEl,termHome[1]);termHome=null}const sc=$('#termScrim');sc&&sc.remove();termOut.innerHTML='<span class="p">$ </span><span class="cur"></span>'}
+  $('#termX').addEventListener('click',termClose);
+  function termShow(cmdText,lines,done){
+    termStop(); const id=++termRun; termOpen();
+    const pre=S('p','$ '); let i=0;
+    (function ty(){ if(id!==termRun)return;
+      if(i<=cmdText.length){termOut.innerHTML=pre+E(cmdText.slice(0,i))+'<span class="cur"></span>';i++;return setTimeout(ty,RM?0:16)}
+      let k=0;(function ln(){ if(id!==termRun)return;
+        termOut.innerHTML=pre+E(cmdText)+'\n'+lines.slice(0,k).join('\n')+(k>=lines.length?'\n'+pre+'<span class="cur"></span>':'');
+        termOut.scrollTop=termOut.scrollHeight;
+        if(k<lines.length){k++;setTimeout(ln,RM?0:26)} else done&&done(id)})();
+    })();
+  }
+  const LINKS={heros:'https://mtlherosduterrain.org',appstore:'https://apps.apple.com/ca/app/id6779714335',nest:'https://github.com/DHMPROG/nest-deck',abdian:'https://github.com/DHMPROG/TCH099-Abdian',github:'https://github.com/DHMPROG',linkedin:'https://www.linkedin.com/in/dahmane'};
+  const EMAIL='aminedahmanepro@gmail.com';
+
+  /* commits réels depuis l'API GitHub (repli : rien) */
+  window.COMMITS=null;
+  const commitsP=fetch('https://api.github.com/repos/DHMPROG/DHMPROG.github.io/commits?per_page=6')
+    .then(r=>r.ok?r.json():null).then(j=>{if(Array.isArray(j))window.COMMITS=j.map(c=>({h:c.sha.slice(0,7),m:(c.commit.message||'').split('\n')[0],d:(c.commit.author&&c.commit.author.date||'').slice(0,10)}));return window.COMMITS}).catch(()=>null);
+
+  function helpTerm(){
+    const g=k=>CMDS.filter(c=>c[0]===k).map(c=>c[1]);
+    const row=(lab,arr)=>S('k',pad(lab,10))+arr.map(x=>':'+x).join('  ');
+    termShow('help',[row('nav',g('sec')),row('actions',g('act')),row('terminal',g('term')),row('cv2',g('fn').concat(g('mod'))),row('fun',g('game').concat(g('fun'))),row('settings',g('th').concat(g('lang'))),'',S('c','tip: type : and use ↑ ↓ Tab ↵')]);
+  }
+  function stats(){
+    const since=new Date(2024,4,1), days=Math.floor((Date.now()-since)/864e5);
+    const bar=n=>S('bar','█'.repeat(n))+S('c','░'.repeat(20-n));
+    termShow('stats --me',[
+      S('k',pad('members',12))+S('s',pad('216',8))+bar(20),
+      S('k',pad('apps live',12))+S('s',pad('1',8))+'App Store (iOS)',
+      S('k',pad('projects',12))+S('s',pad('3',8))+'heros-du-terrain · nest-deck · abdian',
+      S('k',pad('shipping',12))+S('s',pad(days+'d',8))+'since May 2024',
+      S('k',pad('seeking',12))+S('s',t('session'))+' internship',
+      S('k',pad('overbooked',12))+S('s','0')
+    ]);
+  }
+  function lsCmd(){
+    termShow('ls -la ~/amine',[
+      S('c','drwxr-xr-x  amine  staff   ')+S('ok','projects/'),
+      S('c','-rw-r--r--  amine  staff   ')+'README.md',
+      S('c','-rw-r--r--  amine  staff   ')+'log.txt',
+      S('c','-rw-r--r--  amine  staff   ')+'stack.toml',
+      S('c','-rwxr-xr-x  amine  staff   ')+S('bar','contact.sh*'),
+      S('c','-rw-r--r--  amine  staff   ')+'cv.pdf',
+      '',S('c','try :cat README.md')]);
+  }
+  function catCmd(f){
+    f=(f||'').toLowerCase().replace(/^\.?\//,'');
+    const en=LANG==='en'; let L=null;
+    if(f==='readme.md'||f==='readme') L=['# Amine Dahmane','',E($('.tag').textContent.trim()),'','focus: full-stack · mobile · tools I want to exist'];
+    else if(f==='projects'||f==='projects/') L=[S('k','heros-du-terrain')+'  Next.js · iOS · '+(en?'216 members, live on the App Store':'216 membres, sur l’App Store'),S('k','nest-deck       ')+'  FastAPI · SvelteKit · '+(en?'self-hosted Stream Deck':'Stream Deck auto-hébergé'),S('k','abdian          ')+'  PHP MVC · MySQL · '+(en?'flight booking':'réservation de vols'),S('k','side-quests     ')+'  PaintCraft · 2DJavaGame'];
+    else if(f==='log.txt'||f==='log'){L=[];(window.EXPERIENCES||[]).forEach(e=>{const tr=(en&&e.en)||{};const pk=k=>tr[k]||e[k];L.push(S('s',pk('dates'))+'  '+E(pk('role'))+', '+E(e.company));(pk('bullets')||[]).forEach(b=>L.push('  → '+E(b)))});if(!L.length)L=['…']}
+    else if(f==='stack.toml'||f==='stack') L=$$('.skills>div').map(d=>{const k=d.firstElementChild.textContent.trim();const v=[...d.querySelectorAll('.chips span')].map(x=>'"'+x.textContent+'"');return S('k',k)+' = ['+S('s',v.join(', '))+']'});
+    else if(f==='contact.sh'||f==='contact') L=['#!/bin/sh','EMAIL='+S('s','"'+EMAIL+'"'),'GITHUB='+S('s','"github.com/DHMPROG"'),'LINKEDIN='+S('s','"linkedin.com/in/dahmane"'),'echo '+S('s','"'+(en?'open to an internship, ':'ouvert à un stage, ')+t('session')+'"')];
+    else if(f==='cv.pdf') L=[S('c','cat: cv.pdf: binary file. try :cv')];
+    else L=[S('c','cat: '+E(f||'')+': No such file or directory. try :ls')];
+    termShow('cat '+(f||''),L);
+  }
+  function gitLog(){
+    termShow('git log --oneline -6',[S('c','fetching github.com/DHMPROG/DHMPROG.github.io…')],id=>{
+      commitsP.then(cs=>{ if(id!==termRun)return;
+        const L=cs&&cs.length?cs.map(c=>S('s',c.h)+' '+S('c',c.d)+' '+E(c.m)):[S('c','offline: GitHub API unreachable')];
+        termOut.innerHTML=S('p','$ ')+'git log --oneline -6\n'+L.join('\n')+'\n'+S('p','$ ')+'<span class="cur"></span>';
+      });
+    });
+  }
+  function top(){
+    termStop(); termOpen(); termRun++; termMode='top';
+    const since=new Date(2024,4,1);
+    const procs=[['1024','heros-du-terrain','prod · 216 users'],['2048','nest-deck','casting'],['3072','abdian','ci passing'],['4096','portfolio','you are here'],['5120','coffee.sh','refilling'],['6144','job-search',t('session')]];
+    const draw=()=>{ if(termMode!=='top')return;
+      const up=Math.floor((Date.now()-since)/864e5), la=[0,0,0].map(()=> (0.4+Math.random()*1.4).toFixed(2)).join(' ');
+      const rows=procs.map(([pid,n,st])=>{const cpu=(Math.random()*(n==='heros-du-terrain'?60:25)+1).toFixed(1);const b=Math.round(cpu/10);
+        return pad(pid,6)+S('k',pad(n,18))+pad(cpu,6)+S('bar','|'.repeat(b))+S('c','.'.repeat(Math.max(0,8-b)))+'  '+S('c',st)});
+      termOut.innerHTML=S('p','$ ')+'top\n'+'up '+up+' days · load avg '+la+'\n'+'<span class="hd">'+pad('PID',6)+pad('COMMAND',18)+pad('CPU%',6)+pad('',10)+'STATUS</span>\n'+rows.join('\n')+'\n'+S('c','q / esc to quit');
+    };
+    draw(); termTimer=setInterval(draw,1000);
+  }
+  function coffee(){
+    termStop(); termOpen(); const id=++termRun; termMode='coffee'; let lvl=0;
+    const cup=l=>{const fill=r=>r>=5-l;return ['      ( (','       ) )','    ........',
+      '    |'+(fill(1)?S('bar','≈≈≈≈≈≈'):'      ')+'|]','    |'+(fill(2)?S('bar','≈≈≈≈≈≈'):'      ')+'| ]','    |'+(fill(3)?S('bar','≈≈≈≈≈≈'):'      ')+'|_]','    |'+(fill(4)?S('bar','≈≈≈≈≈≈'):'      ')+'|','    \\______/'].join('\n')};
+    const step=()=>{ if(id!==termRun||termMode!=='coffee')return;
+      termOut.innerHTML=S('p','$ ')+'./coffee.sh\n\n'+cup(lvl)+'\n\n'+(lvl<4?S('c','brewing'+'.'.repeat(lvl+1)):S('ok','☕ ready. let’s talk → :mail'));
+      if(lvl<4){lvl++;termTimer=setTimeout(step,RM?0:600)} else termMode=null;
+    }; step();
+  }
+  /* snake */
+  let snake=null;
+  function snakeStart(){
+    termStop(); termOpen(); termRun++; termMode='snake';
+    const fs=parseFloat(getComputedStyle(termOut).fontSize)||13, cols=Math.floor((termOut.clientWidth-36)/(fs*.6));
+    const W=Math.max(10,Math.min(26,Math.floor((cols-2)/2))),H=W<18?14:12; let best=0; try{best=+localStorage.getItem('snakeBest')||0}catch(e){}
+    snake={W,H,body:[[5,6],[4,6],[3,6]],dir:[1,0],next:[1,0],food:null,score:0,best,over:false};
+    placeFood(); drawSnake(); termTimer=setInterval(tickSnake,RM?160:115);
+  }
+  function placeFood(){const g=snake;do{g.food=[(Math.random()*g.W)|0,(Math.random()*g.H)|0]}while(g.body.some(p=>p[0]===g.food[0]&&p[1]===g.food[1]))}
+  function tickSnake(){
+    const g=snake; if(!g||g.over||termMode!=='snake')return;
+    g.dir=g.next; const h=[g.body[0][0]+g.dir[0],g.body[0][1]+g.dir[1]];
+    if(h[0]<0||h[1]<0||h[0]>=g.W||h[1]>=g.H||g.body.some(p=>p[0]===h[0]&&p[1]===h[1])){g.over=true;if(g.score>g.best){g.best=g.score;try{localStorage.setItem('snakeBest',g.best)}catch(e){}}drawSnake();return}
+    g.body.unshift(h); if(h[0]===g.food[0]&&h[1]===g.food[1]){g.score++;placeFood()} else g.body.pop();
+    drawSnake();
+  }
+  function drawSnake(){
+    const g=snake; let o=S('p','$ ')+'./snake  '+S('c','score ')+S('s',g.score)+S('c','  best ')+S('s',Math.max(g.best,g.score))+'\n┌'+'─'.repeat(g.W*2)+'┐\n';
+    for(let y=0;y<g.H;y++){o+='│';for(let x=0;x<g.W;x++){const i=g.body.findIndex(p=>p[0]===x&&p[1]===y);
+      o+= i===0?S('bar','██'):i>0?S('ok','██'):(g.food[0]===x&&g.food[1]===y?S('s','●'+' '):'  ')}o+='│\n'}
+    o+='└'+'─'.repeat(g.W*2)+'┘\n'+(g.over?S('bar','game over')+S('c','  r restart · esc quit'):S('c','←↑↓→ / wasd · swipe · esc quit'));
+    termOut.innerHTML=o;
+  }
+  function snakeDir(d){const g=snake;if(!g||termMode!=='snake')return;if(g.dir[0]+d[0]===0&&g.dir[1]+d[1]===0)return;g.next=d}
+  let sx0=null,sy0=null;
+  termEl.addEventListener('touchstart',e=>{if(termMode!=='snake')return;sx0=e.touches[0].clientX;sy0=e.touches[0].clientY},{passive:true});
+  termEl.addEventListener('touchend',e=>{if(termMode!=='snake'||sx0===null)return;const dx=e.changedTouches[0].clientX-sx0,dy=e.changedTouches[0].clientY-sy0;
+    if(snake.over){snakeStart();return} if(Math.max(Math.abs(dx),Math.abs(dy))<20)return; snakeDir(Math.abs(dx)>Math.abs(dy)?[Math.sign(dx),0]:[0,Math.sign(dy)]);sx0=null});
+  /* clavier prioritaire : snake, top, fermeture, konami */
+  const KON=['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a']; let kpos=0;
+  document.addEventListener('keydown',e=>{
+    if(e.target===cmd) return;
+    if(termMode==='snake'){
+      const m={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0],w:[0,-1],s:[0,1],a:[-1,0],d:[1,0]}[e.key];
+      if(m){e.preventDefault();e.stopImmediatePropagation();snakeDir(m);return}
+      if(e.key==='r'&&snake&&snake.over){e.preventDefault();e.stopImmediatePropagation();snakeStart();return}
+    }
+    if((e.key==='Escape'||(e.key==='q'&&termMode==='top'))&&(termFloat||termMode||$('.qrbox'))){e.preventDefault();e.stopImmediatePropagation();closeQr();if(termFloat)termClose();else{termStop();typeTerm()}return}
+    if(termMode==='snake'&&e.key!==':'){e.stopImmediatePropagation();return}
+    const k=e.key.length===1?e.key.toLowerCase():e.key;
+    kpos= k===KON[kpos]?kpos+1:(k===KON[0]?1:0);
+    if(kpos===KON.length){kpos=0;setPalette('arcade',true);flash('🕹  arcade mode unlocked · :theme nuit to go back')}
+  },true);
+  /* QR */
+  let qrLib=null;
+  function loadQr(){ if(window.qrcode) return Promise.resolve(window.qrcode); if(qrLib) return qrLib;
+    qrLib=new Promise((res,rej)=>{const sc=document.createElement('script');sc.src='https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js';sc.onload=()=>res(window.qrcode);sc.onerror=()=>{qrLib=null;rej()};document.head.appendChild(sc)}); return qrLib; }
+  function closeQr(){const q=$('.qrbox');if(q){q.remove();const sc=$('#qrScrim');sc&&sc.remove()}}
+  function showQr(){
+    const url='https://dhmprog.github.io/';
+    loadQr().then(qrcode=>{
+      closeQr(); const q=qrcode(0,'M'); q.addData(url); q.make(); const n=q.getModuleCount(), sz=8;
+      const sc=document.createElement('div');sc.className='scrim';sc.id='qrScrim';sc.addEventListener('click',closeQr);document.body.appendChild(sc);
+      const box=document.createElement('div');box.className='qrbox';box.innerHTML='<canvas width="'+n*sz+'" height="'+n*sz+'"></canvas><div><b>dhmprog.github.io</b><br>'+(LANG==='en'?'scan me · esc to close':'scanne-moi · échap pour fermer')+'</div>';
+      box.addEventListener('click',closeQr);document.body.appendChild(box);
+      const cx=box.querySelector('canvas').getContext('2d');cx.fillStyle='#fff';cx.fillRect(0,0,n*sz,n*sz);
+      const cells=[];for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(q.isDark(r,c))cells.push([r,c]);
+      cells.sort(()=>Math.random()-.5); cx.fillStyle='#111';
+      if(RM){cells.forEach(([r,c])=>cx.fillRect(c*sz,r*sz,sz,sz));return}
+      let i=0;(function d(){const k=Math.ceil(cells.length/28);for(let j=0;j<k&&i<cells.length;j++,i++){const [r,c]=cells[i];cx.fillRect(c*sz,r*sz,sz,sz)}if(i<cells.length)requestAnimationFrame(d)})();
+    }).catch(()=>flash('qr: could not load the generator (offline?)'));
+    return '>>> qrcode.make("'+url+'")';
+  }
+  /* cast */
+  function cast(){
+    if($('.castfx')) return 'cast: already casting';
+    const fx=document.createElement('div');fx.className='castfx';fx.innerHTML='<i></i>Casting to Nest Hub · living room';document.body.appendChild(fx);
+    winEl.classList.add('casting');
+    setTimeout(()=>{fx.innerHTML='<i></i>Connected · 1280×800 · SSE live sync'},1400);
+    setTimeout(()=>{winEl.classList.remove('casting');setTimeout(()=>fx.remove(),400)},RM?1500:3600);
+    return '>>> pychromecast.get_listed_chromecasts(["Living Room"])[0].media_controller.play_media(page)';
+  }
+  /* sudo */
+  function sudo(rest){
+    if(/^hire\s+amine\b/i.test(rest)){
+      flash('[sudo] password for recruiter: ••••••••');
+      setTimeout(()=>{flash('✓ Permission granted. Contacting Amine…');jump($('#contact'));
+        setTimeout(()=>{const h=$('#contact h2.sec');h.classList.remove('yank');void h.offsetWidth;h.classList.add('yank');$('#mail').classList.add('hire');setTimeout(()=>$('#mail').classList.remove('hire'),3400)},700)},1100);
+      return '[sudo] password for recruiter: ';
+    }
+    return 'recruiter is not in the sudoers file. This incident will be reported. (try :sudo hire amine)';
+  }
+  function ext(v,c,arg){
+    c=(c||'').toLowerCase(); const rest=v.replace(/^\S+\s*/,'');
+    if(c==='cv'){try{window.open(t('cv'),'_blank','noopener')}catch(e){} return ">>> open('"+t('cv').split('/').pop()+"')"}
+    if(c==='mail'||c==='email'){try{navigator.clipboard.writeText(EMAIL).then(()=>flash('copied ✓ '+EMAIL),()=>flash(EMAIL))}catch(e){} return EMAIL}
+    if(c==='open'){const k=(arg||'').toLowerCase().replace('app-store','appstore').replace('nest-deck','nest').replace('héros','heros');if(LINKS[k]){try{window.open(LINKS[k],'_blank','noopener')}catch(e){} return 'open → '+LINKS[k]} return 'open: heros · appstore · nest · abdian · github · linkedin'}
+    if(c==='whoami'){termStop();termOpen();typeTerm();return '>>> whoami --json'}
+    if(c==='stats'){stats();return 'stats → terminal'}
+    if(c==='book'){const n=Math.max(1,Math.min(99,parseInt(arg,10)||30));started.add($('#seats'));jump($('#p-heros'));
+      setTimeout(()=>seatRun(n,(got,req)=>flash('>>> book('+req+') → '+got+' confirmed · '+Math.max(0,req-20)+' waitlisted · 0 overbooked')),400);
+      return '>>> await Promise.all(Array.from({length:'+n+'}, register))'}
+    if(c==='qr') return showQr();
+    if(c==='cast') return cast();
+    if(c==='git'){ if((arg||'').toLowerCase()==='log'){gitLog();return 'git log → terminal'} return 'git: try :git log'}
+    if(c==='ls'||c==='ll'){lsCmd();return 'ls → terminal'}
+    if(c==='cat'){catCmd(arg);return 'cat → terminal'}
+    if(c==='top'||c==='htop'){top();return 'top → terminal · q to quit'}
+    if(c==='snake'){snakeStart();return 'snake → terminal · arrows / wasd'}
+    if(c==='sudo') return sudo(rest);
+    if(c==='coffee'){coffee();return 'brewing…'}
+    if(c==='konami') return '↑ ↑ ↓ ↓ ← → ← → B A  (anywhere on the page)';
+    return undefined;
+  }
+
   /* ---------- go ---------- */
   boot(()=>{
-    $('.hero').classList.add('ready'); decodeName(); typeStatus(); rotate(); typeTerm();
+    $('.hero').classList.add('ready'); decodeName(); typeStatus(); rotate(); Promise.race([commitsP,new Promise(r=>setTimeout(r,900))]).then(()=>typeTerm());
     $$('h2.sec,#seats,#tiles,#paint,[data-count],.rv,#logList').forEach(e=>io.observe(e));
   });
 })();
