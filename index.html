@@ -237,6 +237,20 @@ h2.sec.yank{animation:yank .9s ease-out}
 .bul li::marker{content:"→ ";color:var(--accent)}
 .log .stack{margin:.5rem 0 0}
 @media (max-width:480px){.themes button{padding:0 .35rem}}
+/* cv2 */
+.win.cv{background:var(--bg)}
+#cvLayer{position:fixed;inset:0;pointer-events:none;z-index:13}
+.cvscan{position:fixed;left:0;right:0;height:2px;background:var(--accent2);box-shadow:0 0 18px 4px color-mix(in srgb,var(--accent2) 60%,transparent);animation:cvscan .65s linear forwards}
+@keyframes cvscan{from{top:0}to{top:100%}}
+.cvbox{position:fixed;border:1.5px solid var(--c,var(--accent));animation:cvbox .35s cubic-bezier(.2,.9,.3,1.4) both;animation-delay:var(--d,0s)}
+.cvbox::before,.cvbox::after{content:"";position:absolute;width:10px;height:10px;border:2px solid var(--c,var(--accent))}
+.cvbox::before{left:-4px;top:-4px;border-right:0;border-bottom:0}
+.cvbox::after{right:-4px;bottom:-4px;border-left:0;border-top:0}
+.cvbox span,.cvtrack span{position:absolute;left:-1.5px;bottom:100%;background:var(--c,var(--accent));color:var(--bg);font:600 11px/1.5 var(--f-body);padding:0 .4rem;white-space:nowrap}
+.cvbox.below span{bottom:auto;top:100%}
+@keyframes cvbox{from{opacity:0;transform:scale(1.25)}to{opacity:1;transform:none}}
+.cvtrack{position:fixed;left:0;top:0;width:110px;height:130px;border:1.5px dashed var(--accent2);--c:var(--accent2)}
+.cvtrack i{position:absolute;left:50%;top:50%;width:14px;height:14px;margin:-7px;border:1px solid var(--accent2);border-radius:50%}
 /* terminal du hero */
 .hero-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:clamp(2rem,4vw,5rem);align-items:center}
 .term{display:none;border:1px solid var(--line);background:color-mix(in srgb,var(--panel) 88%,transparent);backdrop-filter:blur(6px);box-shadow:0 30px 60px -40px var(--accent);transition:transform .4s cubic-bezier(.2,.7,.2,1)}
@@ -448,7 +462,7 @@ body{font-size:clamp(14px,.35vw + 8.5px,17px)}
           <dt data-i18n="based">basé à</dt><dd>Montréal, Canada</dd>
         </dl>
         <p class="big" aria-hidden="true" data-i18n="build">on construit ?</p>
-        <p class="eof">~<br>~<br>~ <span class="cm" data-i18n="eof">fait à la main. pas de framework, pas de tracking. essaie :matrix</span></p>
+        <p class="eof">~<br>~<br>~ <span class="cm" data-i18n="eof">fait à la main. pas de framework, pas de tracking. essaie :cv2.detect</span></p>
       </div>
     </section>
   </main>
@@ -471,6 +485,13 @@ body{font-size:clamp(14px,.35vw + 8.5px,17px)}
   </div>
 </div>
 <div class="wipe" id="wipe"></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <filter id="cv-canny" color-interpolation-filters="sRGB"><feColorMatrix type="saturate" values="0"/><feConvolveMatrix order="3" kernelMatrix="-1 -1 -1 -1 8 -1 -1 -1 -1" preserveAlpha="true"/><feComponentTransfer><feFuncR type="linear" slope="4"/><feFuncG type="linear" slope="4"/><feFuncB type="linear" slope="4"/></feComponentTransfer></filter>
+  <filter id="cv-sobel" color-interpolation-filters="sRGB"><feColorMatrix type="saturate" values="0"/><feConvolveMatrix order="3" kernelMatrix="-1 -2 0 -2 0 2 0 2 1" bias="0.5" preserveAlpha="true"/></filter>
+  <filter id="cv-thresh" color-interpolation-filters="sRGB"><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncR type="discrete" tableValues="0 1"/><feFuncG type="discrete" tableValues="0 1"/><feFuncB type="discrete" tableValues="0 1"/></feComponentTransfer></filter>
+  <filter id="cv-pixel" x="0" y="0" width="100%" height="100%"><feFlood x="3" y="3" height="2" width="2"/><feComposite width="8" height="8"/><feTile result="a"/><feComposite in="SourceGraphic" in2="a" operator="in"/><feMorphology operator="dilate" radius="4"/></filter>
+</svg>
+<div id="cvLayer" aria-hidden="true"></div>
 <canvas id="fx" aria-hidden="true"></canvas>
 <canvas id="rain" aria-hidden="true"></canvas>
 <div class="cur" id="cur" aria-hidden="true"></div>
@@ -500,7 +521,7 @@ window.I18N = {
     loading:'chargement…', school:'Baccalauréat en génie logiciel, Montréal.',
     langs:'langages', tools:'outils',
     email:'courriel', copy:'copier', copied:'copié ✓', selected:'sélectionné', cvlink:'télécharger le CV (PDF)', based:'basé à',
-    build:'on construit ?', eof:'fait à la main. pas de framework, pas de tracking. essaie :matrix',
+    build:'on construit ?', eof:'fait à la main. pas de framework, pas de tracking. essaie :cv2.detect',
     cv:'assets/CV-Amine-Dahmane.pdf', langBtn:'Switch to English',
     boot:['monte ~/amine','charge projects/ (3)','connexion à l’App Store','216 membres en ligne','compile personnalite.ts','prêt.'],
     typed:['salut, recruteur','défile ou appuie sur j','modifié oct 2026'],
@@ -529,7 +550,7 @@ window.I18N = {
     loading:'loading…', school:'B.Eng. in software engineering, Montréal.',
     langs:'languages', tools:'tooling',
     email:'email', copy:'copy', copied:'copied ✓', selected:'selected', cvlink:'download résumé (PDF)', based:'based in',
-    build:"let's build.", eof:'built by hand. no framework, no tracking. try :matrix',
+    build:"let's build.", eof:'built by hand. no framework, no tracking. try :cv2.detect',
     cv:'assets/CV-Amine-Dahmane-EN.pdf', langBtn:'Passer en français',
     boot:['mounting ~/amine','loading projects/ (3)','connecting to the App Store','216 members online','compiling personality.ts','ready.'],
     typed:['hello, recruiter','scroll or press j','last edited oct 2026'],
@@ -790,18 +811,78 @@ document.getElementById('langBtn').addEventListener('click',()=>setLang(LANG==='
   LIGHT.addEventListener&&LIGHT.addEventListener('change',()=>{let s=null;try{s=localStorage.getItem('palette')}catch(e){} if(s!=='nuit'&&s!=='papier')setPalette(sysPalette(),true,false)});
   $$('.themes button').forEach(b=>b.addEventListener('click',()=>setPalette(b.dataset.p,true)));
 
+  /* ---------- cv2 : filtres et détection ---------- */
+  const winEl=$('.win'), layer=$('#cvLayer');
+  const CVF={canny:'url(#cv-canny)',sobel:'url(#cv-sobel)',gaussianblur:'blur(4px)',blur:'blur(4px)',threshold:'url(#cv-thresh)',cvtcolor:'grayscale(1)',gray:'grayscale(1)',bitwise_not:'invert(1) hue-rotate(180deg)',invert:'invert(1) hue-rotate(180deg)',resize:'url(#cv-pixel)',pixelate:'url(#cv-pixel)'};
+  const CVMSG={
+    canny:()=>'>>> cv2.Canny(frame, 100, 200) → edges '+innerWidth+'×'+innerHeight,
+    sobel:()=>'>>> cv2.Sobel(frame, cv2.CV_64F, 1, 1, ksize=3) → gradient map',
+    gaussianblur:()=>'>>> cv2.GaussianBlur(frame, (9, 9), 0)', blur:()=>'>>> cv2.GaussianBlur(frame, (9, 9), 0)',
+    threshold:()=>'>>> ret, mask = cv2.threshold(frame, 127, 255, cv2.THRESH_BINARY) → ret=127.0',
+    cvtcolor:()=>'>>> cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)', gray:()=>'>>> cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)',
+    bitwise_not:()=>'>>> cv2.bitwise_not(frame)', invert:()=>'>>> cv2.bitwise_not(frame)',
+    resize:()=>'>>> cv2.resize(frame, None, fx=0.1, fy=0.1, interpolation=cv2.INTER_NEAREST)', pixelate:()=>'>>> cv2.resize(frame, None, fx=0.1, fy=0.1, interpolation=cv2.INTER_NEAREST)'
+  };
+  let cvBoxes=[], trackOn=false, trackEl=null, tx=0, ty=0;
+  function clearBoxes(){cvBoxes.forEach(b=>b.remove());cvBoxes=[]}
+  buf.addEventListener('scroll',()=>{if(cvBoxes.length)clearBoxes()},{passive:true});
+  function cvFilter(f){winEl.classList.toggle('cv',!!f);winEl.style.filter=f||''}
+  function detect(){
+    clearBoxes(); const t0=performance.now();
+    const specs=[['#name','person: amine'],['.term','terminal'],['.facts b','metric'],['.proj h3','project'],['.demo','live_demo'],['.badge','badge'],['.why','insight'],['h2.sec','heading'],['.stack li','tech'],['.chips span','skill'],['.links a','link'],['.tree','file_tree']];
+    const cols=['var(--accent)','var(--accent2)','var(--third)'];
+    const found=[];
+    specs.forEach(([sel,label],k)=>$$(sel).forEach(el=>{
+      const r=el.getBoundingClientRect();
+      if(r.width<8||r.height<8||r.bottom<40||r.top>innerHeight-60||r.right<0||r.left>innerWidth)return;
+      if(found.length<18)found.push({r,label,c:cols[k%3]});
+    }));
+    const ms=Math.round(performance.now()-t0)+12;
+    const scan=document.createElement('div');scan.className='cvscan';layer.appendChild(scan);cvBoxes.push(scan);
+    found.forEach((f,i)=>{
+      const b=document.createElement('div');b.className='cvbox'+(f.r.top<60?' below':'');
+      const pad=4;Object.assign(b.style,{left:(f.r.left-pad)+'px',top:(f.r.top-pad)+'px',width:(f.r.width+pad*2)+'px',height:(f.r.height+pad*2)+'px'});
+      b.style.setProperty('--c',f.c);b.style.setProperty('--d',(RM?0:.55+i*.06)+'s');
+      const conf=(0.86+Math.random()*0.13).toFixed(2);
+      b.innerHTML='<span>'+f.label+' '+conf+'</span>';layer.appendChild(b);cvBoxes.push(b);
+    });
+    return '>>> model.detect(frame) → '+found.length+' objects in '+ms+'ms';
+  }
+  function track(){
+    trackOn=!trackOn;
+    if(!trackOn){trackEl&&trackEl.remove();trackEl=null;return '>>> tracker.release()'}
+    trackEl=document.createElement('div');trackEl.className='cvtrack';trackEl.innerHTML='<i></i><span>recruiter 0.98</span>';layer.appendChild(trackEl);
+    tx=mouse.x>0?mouse.x:innerWidth/2;ty=mouse.y>0?mouse.y:innerHeight/2;
+    (function tl(){if(!trackOn)return;tx+=((mouse.x>0?mouse.x:tx)-tx)*.12;ty+=((mouse.y>0?mouse.y:ty)-ty)*.12;
+      trackEl.style.transform='translate('+(tx-55)+'px,'+(ty-65)+'px)';requestAnimationFrame(tl)})();
+    (function lab(){if(!trackOn)return;trackEl.querySelector('span').textContent='recruiter '+(0.93+Math.random()*0.06).toFixed(2);setTimeout(lab,350)})();
+    return '>>> tracker = cv2.TrackerCSRT_create(); tracker.init(frame, cursor)';
+  }
+  function cv2cmd(raw){
+    if(/^import\s+cv2/i.test(raw)) return '>>> import cv2  # ok. try :cv2.detect · :cv2.Canny · :help cv2';
+    const name=raw.replace(/^cv2?\./i,'').replace(/\(.*$/,'').trim().toLowerCase();
+    if(CVF[name]){clearBoxes();cvFilter(CVF[name]);return CVMSG[name]()}
+    if(name==='detect'||name==='dnn'||name==='face_detect'){return detect()}
+    if(name==='track'||name==='tracker'){return track()}
+    if(name==='reset'||name==='destroyallwindows'){cvFilter('');clearBoxes();if(trackOn)track();return '>>> cv2.destroyAllWindows()  # frame restored'}
+    return 'cv2.error: (-215) unknown function "'+name+'". try :help cv2';
+  }
+  const CV_HELP='cv2: .Canny .Sobel .GaussianBlur .threshold .cvtColor .bitwise_not .resize .detect .track .reset';
+
   /* ---------- command line ---------- */
   const cmd=$('#cmdline');
   function flash(m){cmd.value='';cmd.placeholder=m||':theme papier | nuit';cmd.blur();setMode('NORMAL')}
   function run(v){
     v=v.trim().replace(/^:/,'');const [c,arg]=v.split(/\s+/);
+    if(/^(cv2?\.|import\s+cv2)/i.test(v)) return flash(cv2cmd(v));
+    if(c==='help'&&arg==='cv2') return flash(CV_HELP);
     if(c==='theme'||c==='colo'||c==='colorscheme') return flash(setPalette(arg,true)?'theme → '+arg:'E185: no theme "'+(arg||'')+'". try papier, nuit');
     if(names[c]){jump(document.getElementById(c));return flash('')}
     if(c==='matrix'){rain(true);return flash(t('wake'))}
     if(c==='boom'){for(let i=0;i<6;i++)setTimeout(()=>dispatchEvent(new PointerEvent('pointerdown',{clientX:Math.random()*innerWidth,clientY:Math.random()*innerHeight})),i*120);return flash('💥')}
     if(c==='q'||c==='wq'||c==='q!') return flash(t('quit'));
     if(c==='lang'){const ok=setLang(arg);if(ok)typeTerm();return flash(ok?'lang → '+arg:'lang: fr | en')}
-    if(c==='help') return flash(':theme <name> · :lang fr|en · :matrix · :boom · :contact');
+    if(c==='help') return flash(':theme <name> · :lang fr|en · :matrix · :boom · :help cv2');
     flash(t('badcmd')+v+' (:help)');
   }
   cmd.addEventListener('focus',()=>setMode('COMMAND'));
@@ -836,9 +917,9 @@ document.getElementById('langBtn').addEventListener('click',()=>setLang(LANG==='
       ['k','  "stack"'],['',': ['],['s','"TS"'],['',', '],['s','"Python"'],['',', '],['s','"Swift-ish"'],['','],\n'],
       ['k','  "coffee"'],['',': '],['s','true'],['','\n}\n'],
       ['p','$ '],['','git log --oneline -3\n'],
-      ['s','7ce5c7f'],['',' '+(L?'theme: papier light, nuit dark':'thème : papier en clair, nuit en sombre')+'\n'],
-      ['s','e981c78'],['',' '+(L?'new animated editor portfolio':'nouveau portfolio éditeur animé')+'\n'],
-      ['s','5fc970b'],['',' '+(L?'translate navigation and headings':'traduction de la navigation et des titres')+'\n'],
+      ['s','8a0148a'],['',' '+(L?'full-screen 16:9 layout':'plein écran 16:9')+'\n'],
+      ['s','cd6e9d6'],['',' '+(L?'theme: papier light, nuit dark':'thème : papier en clair, nuit en sombre')+'\n'],
+      ['s','1c1ecee'],['',' '+(L?'new animated editor portfolio':'nouveau portfolio éditeur animé')+'\n'],
       ['p','$ '],
     ];
   }
