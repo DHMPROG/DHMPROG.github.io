@@ -82,7 +82,7 @@ a:hover,a:focus-visible{color:var(--accent);background-size:100% 1px}
 /* hero */
 .hero .code{position:relative}
 .field{position:absolute;inset:-2.2rem -1.25rem 0 -3.2rem;width:calc(100% + 4.45rem);height:calc(100% + 2.2rem);z-index:0;pointer-events:none}
-.hero .code>*:not(.field):not(.field3d){position:relative;z-index:1}
+.hero .code>*:not(.field){position:relative;z-index:1}
 .hero h1{font:800 clamp(2.4rem,7.5vw,4.9rem)/0.98 var(--f-display);letter-spacing:-.04em;margin:.4rem 0 1rem}
 .hero h1 .l2{color:var(--accent)}
 .ch{display:inline-block;transition:transform .25s cubic-bezier(.3,1.6,.5,1),color .2s}
@@ -212,8 +212,7 @@ h2.sec.yank{animation:yank .9s ease-out}
   .buf section{grid-template-columns:2rem minmax(0,1fr)}
   .gut{padding-right:.5rem}
   .code{padding-right:1rem}
-  .field,.field3d{inset:-2.2rem -1rem 0 -2rem;width:calc(100% + 3rem);-webkit-mask-image:none;mask-image:none;opacity:.32}
-  .pitch-stats{display:none}
+  .field{inset:-2.2rem -1rem 0 -2rem;width:calc(100% + 3rem)}
   .log li,.skills>div,.contact dl{grid-template-columns:minmax(0,1fr);gap:.1rem}
   .contact dt{margin-top:.5rem}
   .cmd .hint{display:none}
@@ -235,6 +234,9 @@ h2.sec.yank{animation:yank .9s ease-out}
 .bul li::marker{content:"→ ";color:var(--accent)}
 .log .stack{margin:.5rem 0 0}
 @media (max-width:480px){.themes button{padding:0 .35rem}}
+.wipe{position:fixed;inset:0;pointer-events:none;background:var(--accent);transform:scaleY(0);z-index:15}
+.wipe.go{animation:wipe .7s cubic-bezier(.7,0,.2,1)}
+@keyframes wipe{0%{transform:scaleY(0);transform-origin:bottom}45%{transform:scaleY(1);transform-origin:bottom}55%{transform:scaleY(1);transform-origin:top}100%{transform:scaleY(0);transform-origin:top}}
 /* cv2 */
 .win.cv{background:var(--bg)}
 #cvLayer{position:fixed;inset:0;pointer-events:none;z-index:13}
@@ -287,12 +289,6 @@ html[data-palette="arcade"]{--bg:#0b0221;--panel:#140533;--line:#2b1055;--fg:#f5
 .castfx i{width:8px;height:8px;border-radius:50%;background:var(--accent2);animation:ping 1.2s infinite}
 .hire{animation:hire 1.6s ease-out 2}
 @keyframes hire{0%{box-shadow:0 0 0 0 var(--accent)}100%{box-shadow:0 0 0 18px transparent}}
-/* ASCII 3D (three.js) */
-.field3d{position:absolute;inset:-2.2rem -1.25rem 0 -3.2rem;width:calc(100% + 4.45rem);height:calc(100% + 2.2rem);z-index:0;pointer-events:none;-webkit-mask-image:linear-gradient(90deg,rgb(0 0 0 / .18),rgb(0 0 0 / .55) 45%,#000 75%);mask-image:linear-gradient(90deg,rgb(0 0 0 / .18),rgb(0 0 0 / .55) 45%,#000 75%)}
-.has3d .field{display:none}
-canvas.field3d{image-rendering:pixelated;image-rendering:crisp-edges}
-.pitch-stats{position:absolute!important;right:0;bottom:.6rem;z-index:1;font-size:11px;color:var(--dim);font-variant-numeric:tabular-nums;white-space:nowrap;pointer-events:none}
-.pitch-stats.run{color:var(--accent)}
 /* terminal du hero */
 .hero-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:clamp(2rem,4vw,5rem);align-items:center}
 .term{display:none;border:1px solid var(--line);background:color-mix(in srgb,var(--panel) 88%,transparent);backdrop-filter:blur(6px);box-shadow:0 30px 60px -40px var(--accent);transition:transform .4s cubic-bezier(.2,.7,.2,1)}
@@ -315,7 +311,7 @@ body{font-size:clamp(14px,.35vw + 8.5px,17px)}
   .buf section{padding-inline-end:clamp(1rem,3vw,4rem)}
   .buf section.hero{min-height:100%;padding-block:0}
   .hero .code{display:flex;flex-direction:column;justify-content:center;padding-block:2rem}
-  .field,.field3d{inset:0 calc(-1 * clamp(1rem,3vw,4rem)) 0 -3.2rem;width:auto;height:100%}
+  .field{inset:0 calc(-1 * clamp(1rem,3vw,4rem)) 0 -3.2rem;width:auto;height:100%}
   .hero h1{font-size:clamp(3rem,9.5vw,11rem);line-height:.92}
   .hero .tag{font-size:clamp(1rem,1.35vw,1.6rem);max-width:52ch}
   .facts{gap:.6rem clamp(2rem,5vw,6rem);font-size:clamp(13px,.8vw,15px)}
@@ -383,7 +379,7 @@ body{font-size:clamp(14px,.35vw + 8.5px,17px)}
           <li><b data-count="1">1</b><span data-i18n="f2">app iOS sur l'App Store</span></li>
           <li><b data-count="3">3</b><span data-i18n="f3">projets à ouvrir</span></li>
         </ul>
-        <p class="hint-field" data-i18n="hint">↖ en fond : 30 demandes pour un match à 20 places. tape :book 40</p>
+        <p class="hint-field" data-i18n="hint">↖ le fond réagit à ton curseur. clique n'importe où.</p>
         </div>
         <div class="term" id="term">
           <div class="term-bar"><i></i><i></i><i></i><span>zsh — ~/amine</span><button class="term-x" id="termX" type="button" aria-label="Fermer">×</button></div>
@@ -527,6 +523,7 @@ body{font-size:clamp(14px,.35vw + 8.5px,17px)}
     </div>
   </div>
 </div>
+<div class="wipe" id="wipe"></div>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
   <filter id="cv-canny" color-interpolation-filters="sRGB"><feColorMatrix type="saturate" values="0"/><feConvolveMatrix order="3" kernelMatrix="-1 -1 -1 -1 8 -1 -1 -1 -1" preserveAlpha="true"/><feComponentTransfer><feFuncR type="linear" slope="4"/><feFuncG type="linear" slope="4"/><feFuncB type="linear" slope="4"/></feComponentTransfer></filter>
   <filter id="cv-sobel" color-interpolation-filters="sRGB"><feColorMatrix type="saturate" values="0"/><feConvolveMatrix order="3" kernelMatrix="-1 -2 0 -2 0 2 0 2 1" bias="0.5" preserveAlpha="true"/></filter>
@@ -547,7 +544,7 @@ window.I18N = {
     open:'ouvert aux stages', internship:'stage', session:'Hiver 2027',
     tag:"Étudiant en génie logiciel à l'ÉTS. Je construis <span class=\"hl\">des trucs que des gens finissent par utiliser pour vrai</span>, souvent parce que je trouvais le problème cool avant de trouver la solution.",
     f1:"membres sur une app que j'ai livrée", f2:"app iOS sur l'App Store", f3:'projets à ouvrir',
-    hint:"↖ en fond : 30 demandes pour un match à 20 places. tape :book 40",
+    hint:"↖ le fond réagit à ton curseur. clique n'importe où.",
     prod:'en production', private:'code privé',
     p1:"Plateforme web et app iOS pour un OBNL de soccer communautaire à Montréal : inscription aux matchs à places limitées, check-in par QR code, paiements en ligne, chat d'équipe et feuilles de match en temps réel pour les arbitres. 216 membres, app publiée sur l'App Store.",
     w1:"30 personnes qui cliquent « Je viens » pour un match à 20 places, c'est un problème de concurrence. L'attribution des places doit être atomique côté serveur, jamais confiée au client.",
@@ -576,7 +573,7 @@ window.I18N = {
     open:'open to internships', internship:'internship', session:'Winter 2027',
     tag:'Software engineering student at ÉTS. I build <span class="hl">things people end up actually using</span>, usually because I found the problem cool before I found the solution.',
     f1:'members on an app I shipped', f2:'iOS app on the App Store', f3:'projects worth opening',
-    hint:'↖ in the background: 30 requests for a 20-spot match. type :book 40',
+    hint:'↖ the background reacts to your cursor. click anywhere.',
     prod:'in production', private:'private code',
     p1:'Web platform and iOS app for a community soccer non-profit in Montréal: capacity-limited match sign-ups, QR code check-in, online payments, team chat and real-time match sheets for referees. 216 members, app published on the App Store.',
     w1:'30 people tapping "I’m in" for a 20-spot match is a concurrency problem. Spot allocation has to be atomic on the server, never trusted to the client.',
@@ -839,22 +836,17 @@ document.getElementById('langBtn').addEventListener('click',()=>setLang(LANG==='
 
   /* ---------- main loop ---------- */
   sizeField(); addEventListener('resize',sizeField);
-  (function loop(now){if(!document.documentElement.classList.contains('has3d'))drawField(now);drawSparks();if(FINE&&!RM)moveCursor();drawRain();requestAnimationFrame(loop)})(performance.now());
+  (function loop(now){drawField(now);drawSparks();if(FINE&&!RM)moveCursor();drawRain();requestAnimationFrame(loop)})(performance.now());
 
   /* ---------- themes ---------- */
-  const winEl0=document.querySelector('.win');
+  const wipe=$('#wipe');
   const LIGHT=matchMedia('(prefers-color-scheme: light)');
   const sysPalette=()=>LIGHT.matches?'papier':'nuit';
   function setPalette(p,anim,save=true){
     if(p==='clair'||p==='light')p='papier'; if(p==='sombre'||p==='dark')p='nuit';
     if(!['nuit','papier','arcade'].includes(p))return false;
     const apply=()=>{document.documentElement.dataset.palette=p;$$('.themes button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.p===p))};
-    if(anim&&!RM&&winEl0.animate){
-      const P='perspective(1600px) ';
-      winEl0.animate([{transform:P+'rotateY(0deg)'},{transform:P+'rotateY(90deg) scale(.9)'}],{duration:320,easing:'cubic-bezier(.55,0,.8,.3)'}).finished.then(()=>{
-        apply(); return winEl0.animate([{transform:P+'rotateY(-90deg) scale(.9)'},{transform:P+'rotateY(0deg)'}],{duration:420,easing:'cubic-bezier(.2,.7,.25,1.15)'}).finished;
-      }).catch(apply);
-    } else apply();
+    if(anim&&!RM){wipe.classList.remove('go');void wipe.offsetWidth;wipe.classList.add('go');setTimeout(apply,330)}else apply();
     if(save){try{localStorage.setItem('palette',p)}catch(e){}}
     return true;
   }
@@ -863,6 +855,17 @@ document.getElementById('langBtn').addEventListener('click',()=>setLang(LANG==='
   setPalette(saved||sysPalette(),false,false);
   LIGHT.addEventListener&&LIGHT.addEventListener('change',()=>{let s=null;try{s=localStorage.getItem('palette')}catch(e){} if(s!=='nuit'&&s!=='papier')setPalette(sysPalette(),true,false)});
   $$('.themes button').forEach(b=>b.addEventListener('click',()=>setPalette(b.dataset.p,true)));
+
+  /* ---------- Three.js à la demande (:cv2.depth) ---------- */
+  let p3d=null;
+  function get3d(){
+    if(window.ASCII3D) return Promise.resolve(window.ASCII3D);
+    if(p3d) return p3d;
+    const ok=(()=>{try{const c=document.createElement('canvas');return !!(c.getContext('webgl2')||c.getContext('webgl'))}catch(e){return false}})();
+    if(!ok) return Promise.resolve(null);
+    p3d=import('./assets/scene3d.js').then(m=>(window.ASCII3D=m.start())).catch(e=>{console.warn('3D off:',e);p3d=null;return null});
+    return p3d;
+  }
 
   /* ---------- cv2 : filtres et détection ---------- */
   const winEl=$('.win'), layer=$('#cvLayer');
@@ -917,7 +920,7 @@ document.getElementById('langBtn').addEventListener('click',()=>setLang(LANG==='
     if(/^import\s+cv2/i.test(raw)) return '>>> import cv2  # ok. try :cv2.detect · :cv2.Canny · :help cv2';
     const name=raw.replace(/^cv2?\./i,'').replace(/\(.*$/,'').trim().toLowerCase();
     if(name==='depth'||name==='stereobm'){
-      if(!window.ASCII3D) return 'cv2.error: depth needs WebGL (three.js not loaded yet)';
+      if(!window.ASCII3D){get3d().then(a=>flash(a?cv2cmd(raw):'cv2.error: depth needs WebGL'));return 'loading three.js…'}
       clearBoxes(); const n=window.ASCII3D.depth(true);
       return '>>> depth = cv2.StereoBM_create().compute(page) → '+(typeof n==='number'?n.toLocaleString()+' points · ':'')+'esc to close';
     }
@@ -970,7 +973,7 @@ document.getElementById('langBtn').addEventListener('click',()=>setLang(LANG==='
     ['act','open linkedin','dahmane','Ouvre mon LinkedIn.','Opens my LinkedIn.'],
     ['term','whoami','--json','Retape ma fiche dans le terminal.','Retypes my profile in the terminal.'],
     ['term','stats','','Mon bilan en chiffres, dans le terminal.','My numbers, in the terminal.'],
-    ['term','book 40','[requests]','Test de concurrence sur le terrain PS1 du hero : N joueurs pour 20 places, les autres sur le banc, 0 surréservation.','Concurrency test on the PS1 pitch in the hero: N players for 20 spots, the rest on the bench, zero overbooking.'],
+    ['term','book 20','[requests]','Lance un vrai test de concurrence sur la démo des places : N requêtes pour 20 places, 0 surréservation.','Runs a concurrency test on the seats demo: N requests for 20 spots, zero overbooking.'],
     ['act','qr','','Génère un QR code vers ce portfolio, à scanner avec un téléphone.','Draws a QR code to this portfolio to scan with a phone.'],
     ['act','cast','nest hub','Envoie la page vers un Nest Hub (simulé), clin d’œil à nest-deck.','Casts the page to a Nest Hub (simulated), a nod to nest-deck.'],
     ['term','git log','--oneline','Les vrais derniers commits de ce site, en direct de GitHub.','The real latest commits of this site, live from GitHub.'],
@@ -981,12 +984,6 @@ document.getElementById('langBtn').addEventListener('click',()=>setLang(LANG==='
     ['term','cat stack.toml','','Mes compétences, en TOML.','My skills, as TOML.'],
     ['term','cat contact.sh','','Comment me joindre.','How to reach me.'],
     ['term','top','','Moniteur système façon htop, avec mes projets comme processus. q pour quitter.','An htop-style monitor with my projects as processes. q to quit.'],
-    ['term','ascii nom','[objet]','Rend un objet 3D en caractères dans le terminal : AMINE en voxels.','Renders a 3D object as characters in the terminal: AMINE in voxels.'],
-    ['term','ascii hub','','Le Nest Hub de nest-deck, en ASCII 3D.','The nest-deck Nest Hub, in 3D ASCII.'],
-    ['term','ascii iphone','','L’app iOS de Héros du Terrain, en ASCII 3D.','The Héros du Terrain iOS app, in 3D ASCII.'],
-    ['term','ascii globe','','Le globe d’Abdian avec le vol YUL → CDG.','The Abdian globe with the YUL → CDG flight.'],
-    ['term','ascii ballon','','Un ballon low poly en ASCII.','A low-poly ball in ASCII.'],
-    ['term','ascii noeud','','Un nœud de tore, le classique.','A torus knot, the classic.'],
     ['game','snake','','Un snake dans le terminal. Flèches ou WASD, glisser sur mobile.','Snake in the terminal. Arrows or WASD, swipe on mobile.'],
     ['game','sudo hire amine','','La commande que tout recruteur devrait taper.','The command every recruiter should run.'],
     ['game','coffee','','Une tasse ASCII qui se remplit.','An ASCII cup filling up.'],
@@ -1123,11 +1120,11 @@ document.getElementById('langBtn').addEventListener('click',()=>setLang(LANG==='
 
   /* ---------- commandes étendues ---------- */
   const termEl=$('#term'), termOut=$('#termOut');
-  let termTimer=null, termMode=null, termFloat=false, termHome=null, asciiStop=null;
+  let termTimer=null, termMode=null, termFloat=false, termHome=null;
   const E=x=>String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;');
   const S=(c,x)=>'<span class="'+c+'">'+E(x)+'</span>';
   const pad=(x,n)=>{x=String(x);return x.length>=n?x:x+' '.repeat(n-x.length)};
-  function termStop(){clearInterval(termTimer);clearTimeout(termTimer);termTimer=null;termMode=null;if(asciiStop){asciiStop();asciiStop=null}}
+  function termStop(){clearInterval(termTimer);clearTimeout(termTimer);termTimer=null;termMode=null}
   function termOpen(){
     const hidden=getComputedStyle(termEl).display==='none' && !termEl.classList.contains('float');
     const away=buf.scrollTop>secs[0].offsetHeight*.45;
@@ -1314,9 +1311,6 @@ document.getElementById('langBtn').addEventListener('click',()=>setLang(LANG==='
     if(c==='open'){const k=(arg||'').toLowerCase().replace('app-store','appstore').replace('nest-deck','nest').replace('héros','heros');if(LINKS[k]){try{window.open(LINKS[k],'_blank','noopener')}catch(e){} return 'open → '+LINKS[k]} return 'open: heros · appstore · nest · abdian · github · linkedin'}
     if(c==='whoami'){termStop();termOpen();typeTerm();return '>>> whoami --json'}
     if(c==='stats'){stats();return 'stats → terminal'}
-    if(c==='book'&&window.ASCII3D){const n=Math.max(1,Math.min(99,parseInt(arg,10)||30));jump(secs[0]);
-      window.ASCII3D.book(n).then(r=>flash('>>> book('+r.req+') → '+r.got+' confirmed · '+r.wait+' waitlisted · 0 overbooked'));
-      return '>>> await Promise.all(Array.from({length:'+n+'}, register))'}
     if(c==='book'){const n=Math.max(1,Math.min(99,parseInt(arg,10)||30));started.add($('#seats'));jump($('#p-heros'));
       setTimeout(()=>seatRun(n,(got,req)=>flash('>>> book('+req+') → '+got+' confirmed · '+Math.max(0,req-20)+' waitlisted · 0 overbooked')),400);
       return '>>> await Promise.all(Array.from({length:'+n+'}, register))'}
@@ -1327,11 +1321,6 @@ document.getElementById('langBtn').addEventListener('click',()=>setLang(LANG==='
     if(c==='cat'){catCmd(arg);return 'cat → terminal'}
     if(c==='top'||c==='htop'){top();return 'top → terminal · q to quit'}
     if(c==='snake'){snakeStart();return 'snake → terminal · arrows / wasd'}
-    if(c==='ascii'){
-      if(!window.ASCII3D) return 'ascii: three.js unavailable (WebGL off?)';
-      termStop(); termOpen(); termRun++; const stop=window.ASCII3D.ascii(termOut,arg||'nom');
-      if(!stop){termShow('ascii '+(arg||''),[S('c','ascii: unknown object. try: nom · hub · iphone · globe · ballon · noeud')]);return 'ascii: nom · hub · iphone · globe · ballon · noeud'}
-      termMode='ascii'; asciiStop=stop; return '>>> ascii('+(arg||'nom')+') · esc to quit'}
     if(c==='sudo') return sudo(rest);
     if(c==='coffee'){coffee();return 'brewing…'}
     if(c==='konami') return '↑ ↑ ↓ ↓ ← → ← → B A  (anywhere on the page)';
@@ -1339,12 +1328,7 @@ document.getElementById('langBtn').addEventListener('click',()=>setLang(LANG==='
   }
 
   /* ---------- go ---------- */
-  function load3d(){
-    const ok=(()=>{try{const c=document.createElement('canvas');return !!(c.getContext('webgl2')||c.getContext('webgl'))}catch(e){return false}})();
-    if(!ok) return;
-    import('./assets/scene3d.js').then(m=>{window.ASCII3D=m.start()}).catch(e=>console.warn('3D off:',e));
-  }
-  boot(()=>{ setTimeout(load3d,200);
+  boot(()=>{
     $('.hero').classList.add('ready'); decodeName(); typeStatus(); rotate(); Promise.race([commitsP,new Promise(r=>setTimeout(r,900))]).then(()=>typeTerm());
     $$('h2.sec,#seats,#tiles,#paint,[data-count],.rv,#logList').forEach(e=>io.observe(e));
   });

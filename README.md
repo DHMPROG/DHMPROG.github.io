@@ -7,7 +7,7 @@ Site statique, un seul fichier, aucune étape de build : un portfolio en forme d
 | `index.html` | Le portfolio (HTML, CSS et JS dans un seul fichier, aucune dépendance) |
 | `data/experiences.json` | **Tes expériences** — lues par `index.html` au chargement, affichées dans `log.txt` |
 | `admin.html` | Mini CRUD pour gérer `data/experiences.json` (local seulement) |
-| `assets/` | Logo, CV (FR et EN) et `scene3d.js` (3D Three.js, chargé après l'affichage) |
+| `assets/` | Logo, CV (FR et EN) et `scene3d.js` (Three.js pour `:cv2.depth`, chargé à la demande) |
 
 ### Raccourcis du site
 
@@ -18,7 +18,7 @@ Site statique, un seul fichier, aucune étape de build : un portfolio en forme d
   - **Actions** : `:cv` (ouvre le CV), `:mail` (copie le courriel), `:open heros|appstore|nest|abdian|github|linkedin`, `:qr` (QR code vers le site), `:cast` (envoi simulé vers un Nest Hub)
   - **Terminal** : `:whoami`, `:stats`, `:book 20` (test de concurrence sur la démo des places), `:git log` (vrais commits via l'API GitHub), `:ls`, `:cat README.md|projects|log.txt|stack.toml|contact.sh`, `:top` (`q` pour quitter)
   - **Fun** : `:snake` (flèches / WASD / glisser), `:sudo hire amine`, `:coffee`, `:konami` (indice du thème secret ↑↑↓↓←→←→BA), `:matrix`, `:boom`
-- **3D (Three.js)** : le fond du hero est un terrain de soccer low poly façon PS1 (basse résolution, sommets qui tremblent, textures affines, tramage 15 bits). `:book 40` y rejoue le test de concurrence. `:ascii nom|hub|iphone|globe|ballon|noeud` affiche un objet 3D en caractères dans le terminal. `:cv2.depth` transforme la page en nuage de points 3D. Changer de thème fait basculer la page en 3D. Sans WebGL, le site garde ses versions 2D.
+- **3D (Three.js)** : `:cv2.depth` transforme la page en nuage de points 3D qu'on fait tourner (glisser, molette, Échap pour fermer). Three.js n'est chargé qu'au premier appel.
 - Commandes OpenCV (`:help cv2`), dont `:cv2.face_detect`, `:cv2.dilate`, `:cv2.erode` : `:cv2.Canny`, `:cv2.Sobel`, `:cv2.GaussianBlur`, `:cv2.threshold`, `:cv2.cvtColor`, `:cv2.bitwise_not`, `:cv2.resize` filtrent toute la page ; `:cv2.detect` encadre les éléments visibles avec des boîtes de détection ; `:cv2.track` suit le curseur ; `:cv2.reset` remet tout. La syntaxe complète marche aussi : `:cv2.Canny(page, 100, 200)`, `:import cv2`.
 - Thème : **papier** (clair) ou **nuit** (sombre). Par défaut, suit le réglage clair/sombre de l'appareil ; un clic sur ☀ / ☾ mémorise le choix.
 - Bouton **FR / EN** en bas à droite (choix mémorisé dans le navigateur)
